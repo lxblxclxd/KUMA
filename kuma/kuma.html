@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>kuma4</title>
+
+
+  <script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute  vec4 vNormal;
+attribute vec2 vTexCoord;
+varying float s,t;
+varying vec4 ambient;
+varying vec4 diffuse;
+varying vec4 specular;
+varying vec3 L;
+varying vec3 N;
+
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform mat4 cmt;
+uniform mat4 modelView;
+uniform mat4 projection;
+uniform vec4 lightPosition;
+uniform float shininess;
+
+void
+main()
+{
+  //位置部分
+  gl_Position = projection*modelView*cmt* vPosition;
+
+  //颜色部分
+  // pos is vertex position in eye coordinates
+  vec3 pos=-(modelView*vPosition).xyz;
+  // vector from vertex position to light source
+  
+
+  if(lightPosition.w==0.0) L=normalize((modelView*lightPosition).xyz);
+  else L=normalize((modelView*lightPosition).xyz-pos);
+
+  // Because the eye point the is at the orgin
+  // the vector from the vertex position to the eye is
+  vec3 E=normalize(-pos);
+  vec3 H=normalize(L+E);
+  // Transform vertex normal into eye coordinates
+  N=normalize((modelView*cmt*vNormal).xyz);
+  // Compute terms in the illumination equation
+  ambient=ambientProduct;
+  diffuse=diffuseProduct;
+  
+  float Ks=pow(max(dot(N,H),0.0),shininess);
+  specular=Ks*specularProduct;
+  if(dot(L,N)<0.0) specular=vec4(0.0,0.0,0.0,1.0);
+  
+  s=vTexCoord.x;
+  t=1.0-vTexCoord.y;
+  if(s>=1.0) t=0.0;
+  if(s>1.0) s=s-1.00;
+}
+</script>
+
+  <script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec4 ambient;
+varying vec4 diffuse;
+varying vec4 specular;
+uniform vec4 colorDirect;
+varying vec3 L,N;
+varying float s,t;
+uniform sampler2D texture0;
+uniform sampler2D texture1;
+uniform int bTexCoord;
+void
+main()
+{
+  vec4 fcolor;
+  float Kd=max(dot(L,N),0.0);
+  if(diffuse.w!=0.0)
+    fcolor=ambient+Kd*diffuse+specular;  
+  else 
+  if(bTexCoord==1)
+    fcolor=ambient+Kd*texture2D(texture0,vec2(s,t))+specular;
+  else if(bTexCoord==2)
+    fcolor=ambient+Kd*texture2D(texture1,vec2(s,t))+specular;
+  else if(bTexCoord==3||bTexCoord==5||bTexCoord==7||bTexCoord==9)
+    fcolor=ambient+Kd*vec4(0,0,0,1)+specular;
+  else
+    fcolor=ambient+Kd*vec4(1,1,1,1)+specular;
+  fcolor.a=1.0;
+  if(colorDirect.w==1.0) fcolor=colorDirect;
+    gl_FragColor = fcolor;
+}
+</script>
+
+  <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+  <script type="text/javascript" src="../Common/initShaders.js"></script>
+  <script type="text/javascript" src="../Common/MV.js"></script>
+  <script type="text/javascript" src="primitive.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src="object.js"></script>
+  <script type="text/javascript" src="event.js"></script>
+</head>
+
+<body>
+  <canvas id="gl-canvas" width="512" height="512">
+    Oops ... your browser doesn't support the HTML5 canvas element
+  </canvas>
+
+  <br/>
+  <div style="position:absolute;left: 100px;top:400px">
+    <h3 class="">执行对象：
+      <span style="color:crimson" id="axis">熊一</span>
+    </h3>
+    <button id="xRButton">Rotate X</button>
+    <button id="yRButton">Rotate Y</button>
+    <button id="zRButton">Rotate Z</button>
+    <button id="xTButton">Translation X+</button>
+    <button id="yTButton">Translation Y+</button>
+    <button id="xTnButton">Translation X-</button>
+    <button id="yTnButton">Translation Y-</button>
+    <button id="rsButton">Reset</button>
+  </div>
+
+  <div style="position:absolute;left: 100px;top:500px">
+    <h3 class="">执行对象：
+      <span style="color:crimson" id="axis">熊二</span>
+    </h3>
+
+    <button id="xRButton2">Rotate X</button>
+    <button id="yRButton2">Rotate Y</button>
+    <button id="zRButton2">Rotate Z</button>
+    <button id="xTButton2">Translation X+</button>
+    <button id="yTButton2">Translation Y+</button>
+    <button id="xTnButton2">Translation X-</button>
+    <button id="yTnButton2">Translation Y-</button>
+    <button id="rsButton2">Reset</button>
+  </div>
+
+  <div style="position:absolute;left: 100px;top:600px">
+    <h3 class="">执行对象：
+      <span style="color:crimson" id="axis">视角</span>
+    </h3>
+    <p>
+      <button id="Button1">Increase Z</button>
+      <button id="Button2">Decrease Z</button>
+      <button id="Button3">Increase R</button>
+      <button id="Button4">Decrease R</button>
+      <button id="Button5">Increase theta</button>
+      <button id="Button6">Decrease theta</button>
+      <button id="Button7">Increase phi</button>
+      <button id="Button8">Decrease phi</button>
+      <button id="rsButtonE">Reset</button>
+    </p>
+  </div>
+
+  <div style="position:absolute;left: 100px;top:700px">
+    <h3 class="">执行对象：
+      <span style="color:crimson" id="axis">光源</span><div id="light-position" style="float:right;"></div>
+    </h3>
+    <p>
+      <button id="LightButtonx1">Increase X</button>
+      <button id="LightButtonx2">Decrease X</button>
+      <button id="LightButtony1">Increase Y</button>
+      <button id="LightButtony2">Decrease Y</button>
+      <button id="LightButtonz1">Increase Z</button>
+      <button id="LightButtonz2">Decrease Z</button>
+      <button id="LightReset">Reset</button>
+    </p>
+  </div>
+  <div>  <img id = "texImage" src = "1.jpg" hidden></img>
+  <img id = "texImage1" src = "SA2011_black.gif" hidden></img>
+  <img id = "texImage2" src = "texImageBackGround.jpg" hidden></img>
+  <img id = "texImage3" src = "1.bmp" hidden></img>
+  <img id = "texImage4" src = "2.bmp" hidden></img>
+  <img id = "texImage5" src = "3.bmp" hidden></img>
+</div>
+</body>
+
+</html>
