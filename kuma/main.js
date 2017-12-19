@@ -9,7 +9,7 @@ var xAxis = 0;
 var yAxis = 1;
 var zAxis = 2;
 
-var precise = 5;//精度
+var precise = 10;//精度
 
 var bear1 = new DrawData();
 var bear2 = new DrawData();
@@ -45,22 +45,12 @@ var aspect;       // Viewport aspect ratio
 var eye;
 const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
-var m;
-
-var mvMatrix, pMatrix,normalMatrix;
-var ambientProduc,diffuseProduct,specularProduct;
 
 var cmtLoc,normalMatrixLoc,modelView, projection;
 
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
-
-var materialAmbient;
-var materialDiffuse;
-var materialSpecular;
-var materialShininess;
-var ambientColor, diffuseColor, specularColor;
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -106,7 +96,7 @@ window.onload = function init() {
     sendData(bear2);
 
     sun(dotLight);
-    dotLight.offset=[0.0, 0.0, 3.0];
+    dotLight.offset=[0.0, 1.0, 3.0];
     sendData(dotLight);
 
     image0 = document.getElementById("texImage3");
@@ -116,8 +106,6 @@ window.onload = function init() {
     configureTexture( image1,1 );
     
     addEvents(document);
-
-    
     
     render();
 };
@@ -136,7 +124,7 @@ function sendData(obj){
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normals), gl.STATIC_DRAW);
 
     obj.vNormal = gl.getAttribLocation( program, "vNormal" );
-    gl.vertexAttribPointer( obj.vNormal, 4, gl.FLOAT, false, 0, 0 );
+    gl.vertexAttribPointer( obj.vNormal, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( obj.vNormal);
 
     obj.tBuffer = gl.createBuffer();
@@ -157,6 +145,7 @@ function drawTags(tags)
     for(var i=1;i<tags.length;i++){
         gl.uniform1i(gl.getUniformLocation(program, "bTexCoord"), i);
         gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(tags[i][3]));
+        
         if(i==1)
             gl.activeTexture(gl.TEXTURE0);
         else
@@ -252,52 +241,34 @@ function render() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //lightdot
-    gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(dotLight.offset), dotLight.rMat)));    
     gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(1,0,0,1)) );
+    gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(dotLight.offset), dotLight.rMat)));  
 
     gl.bindBuffer(gl.ARRAY_BUFFER, dotLight.vBuffer);
     gl.vertexAttribPointer(dotLight.vPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, dotLight.nBuffer);
-    gl.vertexAttribPointer(dotLight.vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, dotLight.tBuffer);
-    gl.vertexAttribPointer(dotLight.vTexCoord, 2, gl.FLOAT, false, 0, 0);
 
     drawTags(dotLight.tags);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     //shadow
-    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
+    // gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
 
-    m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
-    mvMatrix = mult(mvMatrix, translate(dotLight.offset));
-    mvMatrix = mult(mvMatrix, m);
-    mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
+    // m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
+    // mvMatrix = mult(mvMatrix, translate(dotLight.offset));
+    // mvMatrix = mult(mvMatrix, m);
+    // mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
 
-    gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix));
-    gl.uniformMatrix4fv( projection, false, flatten(pMatrix));
+    // gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix));
+    // gl.uniformMatrix4fv( projection, false, flatten(pMatrix));
 
-    gl.uniformMatrix4fv(cmtLoc,false,flatten(mult(translate(bear1.offset),bear1.rMat)));
+    // gl.uniformMatrix4fv(cmtLoc,false,flatten(mult(translate(bear1.offset),bear1.rMat)));
+    // gl.bindBuffer( gl.ARRAY_BUFFER, bear1.vBuffer );
+    // gl.vertexAttribPointer( bear1.vPosition, 3, gl.FLOAT, false, 0, 0 );
+    // drawTags(bear1.tags);
 
-
-    gl.bindBuffer( gl.ARRAY_BUFFER, bear1.vBuffer );
-    gl.vertexAttribPointer( bear1.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear1.nBuffer);
-    gl.vertexAttribPointer(bear1.vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear1.tBuffer);
-    gl.vertexAttribPointer(bear1.vTexCoord, 2, gl.FLOAT, false, 0, 0);
-
-    drawTags(bear1.tags);
-
-    gl.uniformMatrix4fv(cmtLoc,false,flatten(mult(translate(bear2.offset),bear2.rMat)));
-
-    gl.bindBuffer( gl.ARRAY_BUFFER, bear2.vBuffer );
-    gl.vertexAttribPointer( bear2.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear2.nBuffer);
-    gl.vertexAttribPointer(bear2.vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear2.tBuffer);
-    gl.vertexAttribPointer(bear2.vTexCoord, 2, gl.FLOAT, false, 0, 0);
-
-    drawTags(bear2.tags);
+    // gl.uniformMatrix4fv(cmtLoc,false,flatten(mult(translate(bear2.offset),bear2.rMat)));
+    // gl.bindBuffer( gl.ARRAY_BUFFER, bear2.vBuffer );
+    // gl.vertexAttribPointer( bear2.vPosition, 3, gl.FLOAT, false, 0, 0 );
+    // drawTags(bear2.tags);
 
 
 
@@ -320,11 +291,11 @@ function configureTexture( image ,i ) {
     if(i==4)
         gl.activeTexture(gl.TEXTURE4);
     if(i==5)
-        gl.activeTexture(gl.TEXTURE4);
+        gl.activeTexture(gl.TEXTURE5);
     if(i==6)
-        gl.activeTexture(gl.TEXTURE4);
+        gl.activeTexture(gl.TEXTURE6);
     if(i==7)
-        gl.activeTexture(gl.TEXTURE4);
+        gl.activeTexture(gl.TEXTURE7);
 
     gl.bindTexture( gl.TEXTURE_2D, texture );
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);

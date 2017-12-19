@@ -37,7 +37,7 @@ function addEvents(document){
     document.getElementById("LightButtony2").onclick = function () { dotLight.offset[1] -= 1.0;  showPosition();};
     document.getElementById("LightButtonz1").onclick = function () { dotLight.offset[2] += 1.0;  showPosition();};
     document.getElementById("LightButtonz2").onclick = function () { dotLight.offset[2] -= 1.0;  showPosition();};
-    document.getElementById("LightReset").onclick = function () { dotLight.offset=[0,0,3];  showPosition();};
+    document.getElementById("LightReset").onclick = function () { dotLight.offset=[0,1,3];  showPosition();};
  
     showPosition();
     
