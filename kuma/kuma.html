@@ -7,8 +7,8 @@
 
 
   <script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 vPosition;
-attribute  vec4 vNormal;
+attribute vec3 vPosition;
+attribute  vec3 vNormal;
 attribute vec2 vTexCoord;
 varying float s,t;
 varying vec4 ambient;
@@ -18,7 +18,10 @@ varying vec3 L;
 varying vec3 N;
 
 uniform vec4 ambientProduct, diffuseProduct, specularProduct;
-uniform mat4 cmt;
+//uniform mat4 cmt;//物体的运动变换矩阵
+uniform mat4 cmt_R;
+uniform mat4 cmt_T;
+uniform mat4 cmtPart;//物体部件的运动变换矩阵
 uniform mat4 modelView;
 uniform mat4 projection;
 uniform vec4 lightPosition;
@@ -28,11 +31,11 @@ void
 main()
 {
   //位置部分
-  gl_Position = projection*modelView*cmt* vPosition;
+  gl_Position = projection*modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
 
   //颜色部分
   // pos is vertex position in eye coordinates
-  vec3 pos=-(modelView*vPosition).xyz;
+  vec3 pos=-(modelView*vec4(vPosition,1)).xyz;
   // vector from vertex position to light source
   
 
@@ -44,7 +47,7 @@ main()
   vec3 E=normalize(-pos);
   vec3 H=normalize(L+E);
   // Transform vertex normal into eye coordinates
-  N=normalize((modelView*cmt*vNormal).xyz);
+  N=normalize((modelView*cmt_R*cmtPart*vec4(normalize(vNormal),0)).xyz);
   // Compute terms in the illumination equation
   ambient=ambientProduct;
   diffuse=diffuseProduct;
@@ -54,9 +57,7 @@ main()
   if(dot(L,N)<0.0) specular=vec4(0.0,0.0,0.0,1.0);
   
   s=vTexCoord.x;
-  t=1.0-vTexCoord.y;
-  if(s>=1.0) t=0.0;
-  if(s>1.0) s=s-1.00;
+  t=vTexCoord.y;
 }
 </script>
 
@@ -82,12 +83,10 @@ main()
   else 
   if(bTexCoord==1)
     fcolor=ambient+Kd*texture2D(texture0,vec2(s,t))+specular;
+    //fcolor=texture2D(texture0,vec2(s,t));
   else if(bTexCoord==2)
     fcolor=ambient+Kd*texture2D(texture1,vec2(s,t))+specular;
-  else if(bTexCoord==3||bTexCoord==5||bTexCoord==7||bTexCoord==9)
-    fcolor=ambient+Kd*vec4(0,0,0,1)+specular;
-  else
-    fcolor=ambient+Kd*vec4(1,1,1,1)+specular;
+    //fcolor=texture2D(texture1,vec2(s,t));
   fcolor.a=1.0;
   if(colorDirect.w==1.0) fcolor=colorDirect;
     gl_FragColor = fcolor;
@@ -138,24 +137,8 @@ main()
     <button id="rsButton2">Reset</button>
   </div>
 
-  <div style="position:absolute;left: 100px;top:600px">
-    <h3 class="">执行对象：
-      <span style="color:crimson" id="axis">视角</span>
-    </h3>
-    <p>
-      <button id="Button1">Increase Z</button>
-      <button id="Button2">Decrease Z</button>
-      <button id="Button3">Increase R</button>
-      <button id="Button4">Decrease R</button>
-      <button id="Button5">Increase theta</button>
-      <button id="Button6">Decrease theta</button>
-      <button id="Button7">Increase phi</button>
-      <button id="Button8">Decrease phi</button>
-      <button id="rsButtonE">Reset</button>
-    </p>
-  </div>
 
-  <div style="position:absolute;left: 100px;top:700px">
+  <div style="position:absolute;left: 100px;top:600px">
     <h3 class="">执行对象：
       <span style="color:crimson" id="axis">光源</span><div id="light-position" style="float:right;"></div>
     </h3>

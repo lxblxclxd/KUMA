@@ -23,7 +23,7 @@ function sphere(points,normals,texs,tags,x,y,z,radis,color)//从外到里的颜�
   for(var j=0;j<180;j+=precise)
   {
     theta2=j/360*2*Math.PI;
-    for(var i=0;i<360;i+=precise)
+    for(var i=0;i<=360;i+=precise)
     {
       theta1=i/360*2*Math.PI;
       px=x+radis*Math.sin(theta2)*Math.cos(theta1);
@@ -32,68 +32,49 @@ function sphere(points,normals,texs,tags,x,y,z,radis,color)//从外到里的颜�
       pxd=x+radis*Math.sin(theta2+precise/360*2*Math.PI)*Math.cos(theta1);
       pyd=y+radis*Math.sin(theta2+precise/360*2*Math.PI)*Math.sin(theta1);
       pzd=z+radis*Math.cos(theta2+precise/360*2*Math.PI);
-      var normalx=(px-x)/Math.sqrt(Math.pow((px-x),2)+Math.pow((py-y),2)+Math.pow((pz-z),2))*5;
-      var normaly=(py-y)/Math.sqrt(Math.pow((px-x),2)+Math.pow((py-y),2)+Math.pow((pz-z),2))*5;
-      var normalz=(pz-z)/Math.sqrt(Math.pow((px-x),2)+Math.pow((py-y),2)+Math.pow((pz-z),2))*5;
-      var normalxd=(pxd-x)/Math.sqrt(Math.pow((pxd-x),2)+Math.pow((pyd-y),2)+Math.pow((pzd-z),2))*5;
-      var normalyd=(pyd-y)/Math.sqrt(Math.pow((pxd-x),2)+Math.pow((pyd-y),2)+Math.pow((pzd-z),2))*5;
-      var normalzd=(pzd-z)/Math.sqrt(Math.pow((pxd-x),2)+Math.pow((pyd-y),2)+Math.pow((pzd-z),2))*5;
+      var normalx=(px-x)/radis;
+      var normaly=(py-y)/radis;
+      var normalz=(pz-z)/radis;
+      var normalxd=(pxd-x)/radis;
+      var normalyd=(pyd-y)/radis;
+      var normalzd=(pzd-z)/radis;
       points.push(vec3(px,py,pz),vec3(pxd,pyd,pzd));
       normals.push(vec3(normalx,normaly,normalz),vec3(normalxd,normalyd,normalzd));
 
       var texx,texy,texxd,texyd;
-      if(pz>=0){
+      if(pz-z>=0){
         texx=(px-x)/(2*radis)+0.5;
-        texy=0.5-(py-y)/(2*radis);
+        texy=0.5+(py-y)/(2*radis);
       }
       else{
-        texx=(px-x)/(2*radis)+1.5;
-        texy=0.5-(py-y)/(2*radis);
+        texx=1.5-(px-x)/(2*radis);
+        texy=0.5+(py-y)/(2*radis);
+        
       }
-      if(pzd>=0){
+      if(pzd-z>=0){
         texxd=(pxd-x)/(2*radis)+0.5;
-        texyd=0.5-(pyd-y)/(2*radis);
+        texyd=0.5+(pyd-y)/(2*radis);
       }
       else{
-        texxd=(pxd-x)/(2*radis)+1.5;
-        texyd=0.5-(pyd-y)/(2*radis);
+        texxd=1.5-(pxd-x)/(2*radis);
+        texyd=0.5+(pyd-y)/(2*radis);
+        
       }
-
+      if(j==91){
+        texx=texxd;
+        texy=texyd;
+      }
+      if(j==90){
+        texxd=texx;
+        texyd=texy;
+      }
+      texx/=2;
+      texxd/=2;
       texs.push(vec2(texx,texy),vec2(texxd,texyd));
     }
    }
-   addTag(tags,color,3,180*360*2/precise/precise);
+   addTag(tags,color,3,180*(360+precise)*2/precise/precise);
 }
-
-// function monosphere(points,normals,texs,tags,x,y,z,radis)//黑白球根据yz平面分割左白右黑
-// {
-//   var theta1;
-//   var theta2;
-
-//   for(var j=0;j<180;j+=precise)
-//   {
-//     theta2=j/360*2*Math.PI;
-//     for(var i=0;i<=360;i+=precise)
-//     {
-//       theta1=i/360*2*Math.PI;
-//       px=x+radis*Math.cos(theta2);
-//       py=y+radis*Math.sin(theta2)*Math.cos(theta1);
-//       pz=z+radis*Math.sin(theta2)*Math.sin(theta1);
-//       pxd=x+radis*Math.cos(theta2+precise/360*2*Math.PI);
-//       pyd=y+radis*Math.sin(theta2+precise/360*2*Math.PI)*Math.cos(theta1);
-//       pzd=z+radis*Math.sin(theta2+precise/360*2*Math.PI)*Math.sin(theta1);
-//       normalx=px-x;
-//       normaly=py-y;
-//       normalz=pz-z;
-//       normalxd=pxd-x;
-//       normalyd=pyd-y;
-//       normalzd=pzd-z;
-//       points.push(vec3(px,py,pz),vec3(pxd,pyd,pzd));
-//       normals.push(vec3(normalx,normaly,normalz),vec3(normalxd,normalyd,normalzd));
-//     }
-//    }
-//    addTag(tags,color,3,180*(360*2/precise+2)/precise);
-// }
 
 /*
 function circleXY(points,texs,tags,x,y,z,radis,color)//平行于xy平面
@@ -190,8 +171,8 @@ function cylinderZ(points,normals,texs,tags,x,y,z,radis,height,color)//柱面，
     py=y+radis*Math.sin(theta);
     pzup=z+height/2;
     pzdown=z-height/2;
-    normalx=(px-x)/radis;
-    normaly=(py-y)/radis;
+    normalx=(px-x)/radis*5;
+    normaly=(py-y)/radis*5;
     normalz=0;
     points.push(vec3(px,py,pzup),vec3(px,py,pzdown));
     normals.push(vec3(normalx,normaly,normalz),vec3(normalx,normaly,normalz));
@@ -233,7 +214,7 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
 
   for(var j=0;j<180;j+=precise){
     theta2=j/360*2*Math.PI;
-    for(var i=0;i<360;i+=precise){
+    for(var i=0;i<=360;i+=precise){
       theta1=i/360*2*Math.PI;
       px=x+a*Math.sin(theta2)*Math.cos(theta1);
       py=y+b*Math.sin(theta2)*Math.sin(theta1);
@@ -253,24 +234,34 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
       var texx,texy,texxd,texyd;
       if(pz>=0){
         texx=(px-x)/(2*a)+0.5;
-        texy=0.5-(py-y)/(2*a);
+        texy=0.5+(py-y)/(2*a);
       }
       else{
-        texx=(px-x)/(2*a)+1.5;
-        texy=0.5-(py-y)/(2*a);
+        texx=1.5-(px-x)/(2*a);
+        texy=0.5+(py-y)/(2*a);
       }
       if(pzd>=0){
         texxd=(pxd-x)/(2*a)+0.5;
-        texyd=0.5-(pyd-y)/(2*a);
+        texyd=0.5+(pyd-y)/(2*a);
       }
       else{
-        texxd=(pxd-x)/(2*a)+1.5;
-        texyd=0.5-(pyd-y)/(2*a);
+        texxd=1.5-(pxd-x)/(2*a);
+        texyd=0.5+(pyd-y)/(2*a);
       }
+      if(j==91){
+        texx=texxd;
+        texy=texyd;
+      }
+      if(j==90){
+        texxd=texx;
+        texyd=texy;
+      }
+      texx/=2;
+      texxd/=2;
       texs.push(vec2(texx,texy),vec2(texxd,texyd));
     }
    }
-   addTag(tags,color,3,180*360*2/precise/precise);
+   addTag(tags,color,3,180*(360+precise)*2/precise/precise);
 }
 
 
