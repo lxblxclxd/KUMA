@@ -11,19 +11,19 @@ var zAxis = 2;
 
 var precise = 10;//精度
 
-var bear1 = new DrawData();
-var bear2 = new DrawData();
-var dotLight = new DrawData();
+var bear1 = new SceneObject();
+var bear2 = new SceneObject();
+var dotLight = new SceneObject();
 
-function DrawData() {
+function SceneObject() {
     this.points = [];
     this.colors = [];
     this.normals=[];//法向量normal vectors
     this.texs=[];
-    this.tags = [[0, 0, 0,vec4()]];//(type,start,numOfPoints,colorRaw(vec4)) 
+    this.tags = [new Tag()];//(type,start,numOfPoints,colorRaw(vec4)) 
                                    //type 1 for Triangles,type 3 for Triangle_Strip;
-    this.offset = [0, 0, 0];//position of current bear
-    this.theta = [0, 0, 0];//direction and speed the bear rotates
+    this.offset = [0, 0, 0];//position of current object
+    this.theta = [0, 0, 0];//direction and speed the object rotates
     this.rMat = mat4();
     this.vBuffer = null;
     this.vPosition = null;
@@ -31,6 +31,15 @@ function DrawData() {
     this.vNormal=null;
     this.tBuffer=null;
     this.vTexCoord=null;
+
+    this.get=null;
+    this.actionList=[];
+    this.setAction=function(action){//设置执行一个动作
+        setAction(this,action);
+    }   
+    this.nextAction=function(){//得出执行动作后的下一步状态
+        nextAction(this);
+    }   
 }
 
 var thetaTest=-135;
@@ -147,32 +156,41 @@ function prepareData(){
 function drawTags(tags)
 {
     for(var i=1;i<tags.length;i++){
+        tag=tags[i];
         gl.uniform1i(gl.getUniformLocation(program, "bTexCoord"), i);
-        gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(tags[i][3]));
-        
+        gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(tag.colorRaw));
         if(i==1)
             gl.activeTexture(gl.TEXTURE0);
         else
             gl.activeTexture(gl.TEXTURE1);
-        if(i==5||i==7)
-            gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
-        else if(i==6||i==8)
-            gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(-0.15,-0.08,0),mult(rotateX(-thetaTest-180),translate(0.15,0.08,0)) )));
-        else
-            gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mat4()));
-        if(tags[i][0]==1)
-            gl.drawArrays( gl.TRIANGLES, tags[i][1], tags[i][2]);
-        if(tags[i][0]==2)
-            gl.drawArrays( gl.TRIANGLE_FAN, tags[i][1], tags[i][2]);
-        if(tags[i][0]==3)
-            gl.drawArrays( gl.TRIANGLE_STRIP, tags[i][1], tags[i][2]);
+        // if(i==5||i==7)
+        //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
+        // else if(i==6||i==8)
+        //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(-0.15,-0.08,0),mult(rotateX(-thetaTest-180),translate(0.15,0.08,0)) )));
+        // else
+        //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mat4()));
+        gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(tag.calCMT()));
+        if(tag.type==1)
+            gl.drawArrays( gl.TRIANGLES, tag.start, tag.numOfPoints);
+        if(tag.type==2)
+            gl.drawArrays( gl.TRIANGLE_FAN, tag.start, tag.numOfPoints);
+        if(tag.type==3)
+            gl.drawArrays( gl.TRIANGLE_STRIP, tag.start, tag.numOfPoints);
     }
 }
 
-function rotates(mat, theta){//原矩阵根据角度左乘旋转矩阵
-    mat = mult(rotateX(theta[0]), mat);
-    mat = mult(rotateY(theta[1]), mat);
-    return mult(rotateZ(theta[2]), mat);
+function rotates(mat, theta,center){//原矩阵根据角度和旋转中心左乘旋转矩阵
+    if (arguments.length == 3)
+        mat=  mult(translate(negate(center)), mat);
+    if(theta[xAxis]!=0)
+        mat = mult(rotateX(theta[xAxis]), mat);
+    if(theta[yAxis]!=0)
+        mat = mult(rotateY(theta[yAxis]), mat);
+    if(theta[zAxis]!=0)
+        mat = mult(rotateZ(theta[zAxis]), mat);
+    if (arguments.length == 3)
+        mat=  mult(translate(center), mat);
+    return mat;
 }
 
 function render() {
@@ -194,9 +212,11 @@ function render() {
     gl.uniformMatrix4fv(modelView, false, flatten(mvMatrix));
     gl.uniformMatrix4fv(projection, false, flatten(pMatrix));
     gl.uniform4fv( gl.getUniformLocation(program,"lightPosition"),flatten(vec4(dotLight.offset,0)));
+
     //two bears
     gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,0)) );
     bear1.rMat = rotates(bear1.rMat, bear1.theta);
+    bear1.nextAction();
     //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear1.offset), bear1.rMat)));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear1.rMat));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));

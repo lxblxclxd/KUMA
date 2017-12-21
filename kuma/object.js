@@ -2,25 +2,52 @@
 
 function bear(points,normals,texs,tags){
     a=Object.prototype.toString.call(points);
-    if(a== "[object Object]"){//function bear(bear)
-      tags=points.tags;
-      texs=points.texs;
-      normals=points.normals;
-      points=points.points;
+    if(a== "[object Object]"){//function bear(bear) 
+      obj=points;
+      tags=obj.tags;
+      texs=obj.texs;
+      normals=obj.normals;
+      points=obj.points;
     }
-    sphere(points,normals,texs,tags,0,0.3,0,0.2,color_undefined);//face
-    ellipsoid(points,normals,texs,tags,0,0,0,0.27,0.2,0.2,color_undefined);//body
-    ellipsoid(points,normals,texs,tags,0.27,0,0,0.05,0.08,0.05,black);//right hand
-    ellipsoid(points,normals,texs,tags,-0.27,0,0,0.05,0.08,0.05,white);//left hand
-    cylinderZ(points,normals,texs,tags,0.15,-0.08,0.15,0.07,0.3,black);//right leg
-    cylinderZ(points,normals,texs,tags,-0.15,-0.08,0.15,0.07,0.3,white);//left leg
-    ellipsoid(points,normals,texs,tags,0.15,-0.08,0.3,0.07,0.09,0.07,black);//right foot
-    ellipsoid(points,normals,texs,tags,-0.15,-0.08,0.3,0.07,0.09,0.07,white);//left foot
-    sphere(points,normals,texs,tags,0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,black);//right ear
-    sphere(points,normals,texs,tags,-0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,white);//left ear
-    //sphere(points,normals,texs,tags,0.1,0.33,Math.sqrt(0.021),0.03,eye);//right eye
-    //sphere(points,normals,texs,tags,-0.1,0.33,Math.sqrt(0.021),0.03,eye);//left eye
-    //sphere(points,normals,texs,tags,0,0.27,Math.sqrt(0.031),0.04,eye);//nose
+    //计算points，normals和texs并设置颜色
+    //左右区分按照熊自身的位置，如左手在我们默认视角的右侧
+    head      = sphere(points,normals,texs,tags,0,0.3,0,0.2,color_undefined);//face
+    body      = ellipsoid(points,normals,texs,tags,0,0,0,0.27,0.2,0.2,color_undefined);//body
+    leftHand  = ellipsoid(points,normals,texs,tags,0.27,0,0,0.05,0.08,0.05,black);//left hand
+    rightHand = ellipsoid(points,normals,texs,tags,-0.27,0,0,0.05,0.08,0.05,white);//right hand
+    leftLeg   = cylinderZ(points,normals,texs,tags,0.15,-0.08,0.0,0.3,0.07,black);//left leg
+    rightLeg  = cylinderZ(points,normals,texs,tags,-0.15,-0.08,0.0,0.3,0.07,white);//right leg
+    leftFoot  = ellipsoid(points,normals,texs,tags,0.15,-0.08,0.3,0.07,0.09,0.07,black);//left foot
+    rightFoot = ellipsoid(points,normals,texs,tags,-0.15,-0.08,0.3,0.07,0.09,0.07,white);//right foot
+    leftEar   = sphere(points,normals,texs,tags,0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,black);//left ear
+    rightEar  = sphere(points,normals,texs,tags,-0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,white);//right ear
+
+    //设置名称映射关系
+    obj.get={
+      'head':head,
+      'body':body,
+      'leftHand':leftHand,
+      'rightHand':rightHand,
+      'leftLeg':leftLeg,
+      'rightLeg':rightLeg,
+      'leftFoot':leftFoot,
+      'rightFoot':rightFoot,
+      'leftEar':leftEar,
+      'rightEar':rightEar,
+  };
+
+    //设置关节树
+    body.attach(head,head.downPos);
+    body.attach(leftHand,leftHand.leftPos);
+    body.attach(rightHand,rightHand.rightPos);
+    body.attach(leftLeg,leftLeg.backPos);
+    body.attach(rightLeg,rightLeg.backPos);
+    head.attach(leftEar,vec3(0.2*Math.cos(Math.PI/3),0.28+0.2*Math.sin(Math.PI/3),0));
+    head.attach(rightEar,vec3(-0.2*Math.cos(Math.PI/3),0.28+0.2*Math.sin(Math.PI/3),0));
+    leftLeg.attach(leftFoot,leftFoot.backPos);
+    rightLeg.attach(rightFoot,rightFoot.backPos);
+
+    //leftLeg.theta=[-135,0,0];
 }
 
 function  sun(points,normals,texs,tags){

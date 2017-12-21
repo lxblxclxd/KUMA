@@ -1,3 +1,10 @@
+front = [0.0, 0.0, 0.05];
+back = [0.0, 0.0, -0.05];
+upward = [0.0, 0.05, 0.0];
+down = [0.0, -0.05, 0.0];
+left = [0.05, 0.0, 0.0];
+right = [-0.05, 0.0, 0.0];
+
 function addEvents(document){
     //event listeners for buttons
     document.getElementById("xRButton").onclick = function () { bear1.theta[xAxis] = (bear1.theta[xAxis] + 5.0) % 10; };
@@ -52,26 +59,30 @@ function addEvents(document){
             up[yAxis] = -up[yAxis];
 
         //bear1
-        if (keycode == 87) bear1.offset = move(upward, bear1.rMat, bear1.offset);//w
-        if (keycode == 65) bear1.offset = move(left, bear1.rMat, bear1.offset);//a
-        if (keycode == 83) bear1.offset = move(down, bear1.rMat, bear1.offset);//s
-        if (keycode == 68) bear1.offset = move(right, bear1.rMat, bear1.offset);//d
-        if (keycode == 81) bear1.offset = move(front, bear1.rMat, bear1.offset);//q
-        if (keycode == 69) bear1.offset = move(back, bear1.rMat, bear1.offset);//e
+        if (keycode == 87) move(bear1, upward);//w
+        if (keycode == 65) move(bear1, left);//a
+        if (keycode == 83) move(bear1, down);//s
+        if (keycode == 68) move(bear1, right);//d
+        if (keycode == 81) move(bear1, front);//q
+        if (keycode == 69) move(bear1, back);//e
 
         //bear2
-        if (keycode == 73) bear2.offset = move(upward, bear2.rMat, bear2.offset);//i
-        if (keycode == 74) bear2.offset = move(left, bear2.rMat, bear2.offset);//j
-        if (keycode == 75) bear2.offset = move(down, bear2.rMat, bear2.offset);//k
-        if (keycode == 76) bear2.offset = move(right, bear2.rMat, bear2.offset);//l
-        if (keycode == 85) bear2.offset = move(front, bear2.rMat, bear2.offset);//u
-        if (keycode == 79) bear2.offset = move(back, bear2.rMat, bear2.offset);//o
+        if (keycode == 73) move(bear2, upward);//i
+        if (keycode == 74) move(bear2, left);//j
+        if (keycode == 75) move(bear2, down);//k
+        if (keycode == 76) move(bear2, right);//l
+        if (keycode == 85) move(bear2, front);//u
+        if (keycode == 79) move(bear2, back);//o
+
+        if (keycode == 32) bear1.setAction('JumpUp');//space
     }
 }
 
-function move(dir, mat, offset){//算出移动后的偏移量
-    offset[xAxis] += (bear1.rMat[xAxis][0] * dir[0] + bear1.rMat[xAxis][1] * dir[1] + bear1.rMat[xAxis][2] * dir[2]);
-    offset[yAxis] += (bear1.rMat[yAxis][0] * dir[0] + bear1.rMat[yAxis][1] * dir[1] + bear1.rMat[yAxis][2] * dir[2]);
-    offset[zAxis] += (bear1.rMat[zAxis][0] * dir[0] + bear1.rMat[zAxis][1] * dir[1] + bear1.rMat[zAxis][2] * dir[2]);
+function move(obj,dir){//算出移动后的偏移量
+    mat=obj.rMat;
+    offset=obj.offset;
+    offset[xAxis] += (mat[xAxis][0] * dir[0] + mat[xAxis][1] * dir[1] + mat[xAxis][2] * dir[2]);
+    offset[yAxis] += (mat[yAxis][0] * dir[0] + mat[yAxis][1] * dir[1] + mat[yAxis][2] * dir[2]);
+    offset[zAxis] += (mat[zAxis][0] * dir[0] + mat[zAxis][1] * dir[1] + mat[zAxis][2] * dir[2]);
     return offset;
 }
