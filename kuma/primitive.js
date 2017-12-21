@@ -32,12 +32,12 @@ function sphere(points,normals,texs,tags,x,y,z,radis,color)//从外到里的颜�
       pxd=x+radis*Math.sin(theta2+precise/360*2*Math.PI)*Math.cos(theta1);
       pyd=y+radis*Math.sin(theta2+precise/360*2*Math.PI)*Math.sin(theta1);
       pzd=z+radis*Math.cos(theta2+precise/360*2*Math.PI);
-      var normalx=(px-x)/Math.sqrt(Math.pow((px-x),2)+Math.pow((py-y),2)+Math.pow((pz-z),2))*5;
-      var normaly=(py-y)/Math.sqrt(Math.pow((px-x),2)+Math.pow((py-y),2)+Math.pow((pz-z),2))*5;
-      var normalz=(pz-z)/Math.sqrt(Math.pow((px-x),2)+Math.pow((py-y),2)+Math.pow((pz-z),2))*5;
-      var normalxd=(pxd-x)/Math.sqrt(Math.pow((pxd-x),2)+Math.pow((pyd-y),2)+Math.pow((pzd-z),2))*5;
-      var normalyd=(pyd-y)/Math.sqrt(Math.pow((pxd-x),2)+Math.pow((pyd-y),2)+Math.pow((pzd-z),2))*5;
-      var normalzd=(pzd-z)/Math.sqrt(Math.pow((pxd-x),2)+Math.pow((pyd-y),2)+Math.pow((pzd-z),2))*5;
+      var normalx=(px-x)/radis;
+      var normaly=(py-y)/radis;
+      var normalz=(pz-z)/radis;
+      var normalxd=(pxd-x)/radis;
+      var normalyd=(pyd-y)/radis;
+      var normalzd=(pzd-z)/radis;
       points.push(vec3(px,py,pz),vec3(pxd,pyd,pzd));
       normals.push(vec3(normalx,normaly,normalz),vec3(normalxd,normalyd,normalzd));
 
@@ -171,8 +171,8 @@ function cylinderZ(points,normals,texs,tags,x,y,z,radis,height,color)//柱面，
     py=y+radis*Math.sin(theta);
     pzup=z+height/2;
     pzdown=z-height/2;
-    normalx=(px-x)/radis;
-    normaly=(py-y)/radis;
+    normalx=(px-x)/radis*5;
+    normaly=(py-y)/radis*5;
     normalz=0;
     points.push(vec3(px,py,pzup),vec3(px,py,pzdown));
     normals.push(vec3(normalx,normaly,normalz),vec3(normalx,normaly,normalz));

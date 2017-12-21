@@ -33,6 +33,10 @@ function DrawData() {
     this.vTexCoord=null;
 }
 
+var thetaTest=-135;
+var direction=5;
+var jumpHeight=0;
+var directionj=0.5;
 //data for perspective
 var near = 0.3;
 var far = 30.0;
@@ -150,6 +154,12 @@ function drawTags(tags)
             gl.activeTexture(gl.TEXTURE0);
         else
             gl.activeTexture(gl.TEXTURE1);
+        if(i==5||i==7)
+            gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
+        else if(i==6||i==8)
+            gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(-0.15,-0.08,0),mult(rotateX(-thetaTest-180),translate(0.15,0.08,0)) )));
+        else
+            gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mat4()));
         if(tags[i][0]==1)
             gl.drawArrays( gl.TRIANGLES, tags[i][1], tags[i][2]);
         if(tags[i][0]==2)
@@ -165,18 +175,16 @@ function rotates(mat, theta){//原矩阵根据角度左乘旋转矩阵
     return mult(rotateZ(theta[2]), mat);
 }
 
-function move(dir, mat, offset){//算出移动后的偏移量
-    offset[xAxis] += (bear1.rMat[xAxis][0] * dir[0] + bear1.rMat[xAxis][1] * dir[1] + bear1.rMat[xAxis][2] * dir[2]);
-    offset[yAxis] += (bear1.rMat[yAxis][0] * dir[0] + bear1.rMat[yAxis][1] * dir[1] + bear1.rMat[yAxis][2] * dir[2]);
-    offset[zAxis] += (bear1.rMat[zAxis][0] * dir[0] + bear1.rMat[zAxis][1] * dir[1] + bear1.rMat[zAxis][2] * dir[2]);
-    return offset;
-}
-
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     //view
     //theta+=dr;
+    if(thetaTest>-45)
+        direction=-5;
+    if(thetaTest<-135)
+        direction=5;
+    thetaTest+=direction;
     eye = vec3(radius * Math.sin(phi) * Math.cos(theta),
         radius * Math.cos(phi),
         radius * Math.sin(phi) * Math.sin(theta));
@@ -189,8 +197,10 @@ function render() {
     //two bears
     gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,0)) );
     bear1.rMat = rotates(bear1.rMat, bear1.theta);
-    gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear1.offset), bear1.rMat)));
-
+    //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear1.offset), bear1.rMat)));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear1.rMat));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));
+    
     gl.bindBuffer(gl.ARRAY_BUFFER, bear1.vBuffer);
     gl.vertexAttribPointer(bear1.vPosition, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, bear1.nBuffer);
@@ -215,7 +225,9 @@ function render() {
 
 
     bear2.rMat = rotates(bear2.rMat, bear2.theta);
-    gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear2.offset), bear2.rMat)));
+    //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear2.offset), bear2.rMat)));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear2.rMat));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear2.offset)));
 
     gl.bindBuffer(gl.ARRAY_BUFFER, bear2.vBuffer);
     gl.vertexAttribPointer(bear2.vPosition, 3, gl.FLOAT, false, 0, 0);

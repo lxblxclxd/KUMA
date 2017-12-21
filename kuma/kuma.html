@@ -18,7 +18,10 @@ varying vec3 L;
 varying vec3 N;
 
 uniform vec4 ambientProduct, diffuseProduct, specularProduct;
-uniform mat4 cmt;
+//uniform mat4 cmt;//物体的运动变换矩阵
+uniform mat4 cmt_R;
+uniform mat4 cmt_T;
+uniform mat4 cmtPart;//物体部件的运动变换矩阵
 uniform mat4 modelView;
 uniform mat4 projection;
 uniform vec4 lightPosition;
@@ -28,7 +31,7 @@ void
 main()
 {
   //位置部分
-  gl_Position = projection*modelView*cmt* vec4(vPosition,1);
+  gl_Position = projection*modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
 
   //颜色部分
   // pos is vertex position in eye coordinates
@@ -44,7 +47,7 @@ main()
   vec3 E=normalize(-pos);
   vec3 H=normalize(L+E);
   // Transform vertex normal into eye coordinates
-  N=normalize((modelView*cmt*vec4(vNormal,1)).xyz);
+  N=normalize((modelView*cmt_R*cmtPart*vec4(normalize(vNormal),0)).xyz);
   // Compute terms in the illumination equation
   ambient=ambientProduct;
   diffuse=diffuseProduct;
@@ -134,24 +137,8 @@ main()
     <button id="rsButton2">Reset</button>
   </div>
 
-  <div style="position:absolute;left: 100px;top:600px">
-    <h3 class="">执行对象：
-      <span style="color:crimson" id="axis">视角</span>
-    </h3>
-    <p>
-      <button id="Button1">Increase Z</button>
-      <button id="Button2">Decrease Z</button>
-      <button id="Button3">Increase R</button>
-      <button id="Button4">Decrease R</button>
-      <button id="Button5">Increase theta</button>
-      <button id="Button6">Decrease theta</button>
-      <button id="Button7">Increase phi</button>
-      <button id="Button8">Decrease phi</button>
-      <button id="rsButtonE">Reset</button>
-    </p>
-  </div>
 
-  <div style="position:absolute;left: 100px;top:700px">
+  <div style="position:absolute;left: 100px;top:600px">
     <h3 class="">执行对象：
       <span style="color:crimson" id="axis">光源</span><div id="light-position" style="float:right;"></div>
     </h3>

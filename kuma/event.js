@@ -18,18 +18,6 @@ function addEvents(document){
     document.getElementById("yTnButton2").onclick = function () { bear2.offset[yAxis] -= 0.1; };
     document.getElementById("rsButton2").onclick = function () { bear2.offset = [0.5, 0, 0]; bear2.theta = [0, 0, 0]; bear2.rMat = mat4(); };
 
-    // buttons for viewing parameters
-
-    document.getElementById("Button1").onclick = function () { near *= 1.1; far *= 1.1; };
-    document.getElementById("Button2").onclick = function () { near *= 0.9; far *= 0.9; };
-    document.getElementById("Button3").onclick = function () { radius *= 2.0; };
-    document.getElementById("Button4").onclick = function () { radius *= 0.5; };
-    document.getElementById("Button5").onclick = function () { theta += dr; };
-    document.getElementById("Button6").onclick = function () { theta -= dr; };
-    document.getElementById("Button7").onclick = function () { if (phi < Math.PI) phi += dr; };
-    document.getElementById("Button8").onclick = function () { if (phi > 0) phi -= dr; };
-    document.getElementById("rsButtonE").onclick = function () { near = 0.3; far = 5.0; radius = 4.0; theta = 0.0; phi = 0.0; };
-
     //lightbuttons
     document.getElementById("LightButtonx1").onclick = function () { dotLight.offset[0] += 1.0; showPosition();};
     document.getElementById("LightButtonx2").onclick = function () { dotLight.offset[0] -= 1.0;  showPosition();};
@@ -79,4 +67,11 @@ function addEvents(document){
         if (keycode == 85) bear2.offset = move(front, bear2.rMat, bear2.offset);//u
         if (keycode == 79) bear2.offset = move(back, bear2.rMat, bear2.offset);//o
     }
+}
+
+function move(dir, mat, offset){//算出移动后的偏移量
+    offset[xAxis] += (bear1.rMat[xAxis][0] * dir[0] + bear1.rMat[xAxis][1] * dir[1] + bear1.rMat[xAxis][2] * dir[2]);
+    offset[yAxis] += (bear1.rMat[yAxis][0] * dir[0] + bear1.rMat[yAxis][1] * dir[1] + bear1.rMat[yAxis][2] * dir[2]);
+    offset[zAxis] += (bear1.rMat[zAxis][0] * dir[0] + bear1.rMat[zAxis][1] * dir[1] + bear1.rMat[zAxis][2] * dir[2]);
+    return offset;
 }
