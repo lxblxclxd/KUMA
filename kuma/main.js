@@ -216,10 +216,10 @@ function render() {
     //two bears
     gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,0)) );
     bear1.rMat = rotates(bear1.rMat, bear1.theta);
-    bear1.nextAction();
     //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear1.offset), bear1.rMat)));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear1.rMat));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));
+    bear1.nextAction();
     
     gl.bindBuffer(gl.ARRAY_BUFFER, bear1.vBuffer);
     gl.vertexAttribPointer(bear1.vPosition, 3, gl.FLOAT, false, 0, 0);
@@ -243,11 +243,11 @@ function render() {
     gl.uniform1f( gl.getUniformLocation(program,"shininess"),materialShininess );
     drawTags(bear1.tags);
 
-
     bear2.rMat = rotates(bear2.rMat, bear2.theta);
     //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear2.offset), bear2.rMat)));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear2.rMat));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear2.offset)));
+    bear2.nextAction();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, bear2.vBuffer);
     gl.vertexAttribPointer(bear2.vPosition, 3, gl.FLOAT, false, 0, 0);
@@ -282,27 +282,27 @@ function render() {
     drawTags(dotLight.tags);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     //shadow
-    // gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
+    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
 
-    // m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
-    // mvMatrix = mult(mvMatrix, translate(dotLight.offset));
-    // mvMatrix = mult(mvMatrix, m);
-    // mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
+    m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
+    mvMatrix = mult(mvMatrix, translate(dotLight.offset));
+    mvMatrix = mult(mvMatrix, m);
+    mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
 
-    // gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix));
-    // gl.uniformMatrix4fv( projection, false, flatten(pMatrix));
+    gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix));
+    gl.uniformMatrix4fv( projection, false, flatten(pMatrix));
 
-    // gl.uniformMatrix4fv(cmtLoc,false,flatten(mult(translate(bear1.offset),bear1.rMat)));
-    // gl.bindBuffer( gl.ARRAY_BUFFER, bear1.vBuffer );
-    // gl.vertexAttribPointer( bear1.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    // drawTags(bear1.tags);
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear1.rMat));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));
+    gl.bindBuffer( gl.ARRAY_BUFFER, bear1.vBuffer );
+    gl.vertexAttribPointer( bear1.vPosition, 3, gl.FLOAT, false, 0, 0 );
+    drawTags(bear1.tags);
 
-    // gl.uniformMatrix4fv(cmtLoc,false,flatten(mult(translate(bear2.offset),bear2.rMat)));
-    // gl.bindBuffer( gl.ARRAY_BUFFER, bear2.vBuffer );
-    // gl.vertexAttribPointer( bear2.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    // drawTags(bear2.tags);
-
-
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear2.rMat));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear2.offset)));
+    gl.bindBuffer( gl.ARRAY_BUFFER, bear2.vBuffer );
+    gl.vertexAttribPointer( bear2.vPosition, 3, gl.FLOAT, false, 0, 0 );
+    drawTags(bear2.tags);
 
     window.requestAnimFrame(render);
 
@@ -312,23 +312,7 @@ function configureTexture( image ,i ) {
     if(i<0||i>=8)
         return;
     texture = gl.createTexture();
-    if(i==0)
-        gl.activeTexture(gl.TEXTURE0);
-    if(i==1)
-        gl.activeTexture(gl.TEXTURE1);
-    if(i==2)
-        gl.activeTexture(gl.TEXTURE2);
-    if(i==3)
-        gl.activeTexture(gl.TEXTURE3);
-    if(i==4)
-        gl.activeTexture(gl.TEXTURE4);
-    if(i==5)
-        gl.activeTexture(gl.TEXTURE5);
-    if(i==6)
-        gl.activeTexture(gl.TEXTURE6);
-    if(i==7)
-        gl.activeTexture(gl.TEXTURE7);
-
+    gl.activeTexture(gl.TEXTURE0+i);
     gl.bindTexture( gl.TEXTURE_2D, texture );
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB,
@@ -337,7 +321,6 @@ function configureTexture( image ,i ) {
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
                         gl.NEAREST_MIPMAP_LINEAR );
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-
     gl.uniform1i(gl.getUniformLocation(program, "texture"+i), i);
     
 }

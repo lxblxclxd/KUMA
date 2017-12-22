@@ -21,7 +21,7 @@ function Tag(type,start,numOfPoints,colorRaw) {
   this.start=start;
   this.numOfPoints=numOfPoints;
   this.colorRaw=colorRaw;
-  
+
   this.theta=[0,0,0];//离初始位置的偏转角度在三个方向的分量
   this.rootPos=vec3();//物体旋转所绕的点
   //this.tailPos=vec3();
@@ -35,11 +35,11 @@ function Tag(type,start,numOfPoints,colorRaw) {
   this.centerPos=vec3();
 
   this.father=null;//父节点
-  this.leaves=[];//子节点
-  this.attach=function(leaf,pos){
-    leaf.father=this;
-    leaf.rootPos=pos;
-    this.leaves.push(leaf);
+  this.sons=[];//子节点
+  this.attach=function(son,pos){
+    son.father=this;
+    son.rootPos=pos;
+    this.sons.push(son);
   }
   this.calRMat=function(){
     if(this.father==null)
@@ -52,6 +52,9 @@ function Tag(type,start,numOfPoints,colorRaw) {
       return rotates(mat4(),this.theta,this.rootPos);
     else
       return rotates(this.father.calCMT(),this.theta,this.rootPos);
+  }
+  this.lengthz=function(){
+    return this.frontPos[2]-this.backPos[2];
   }
 }
 

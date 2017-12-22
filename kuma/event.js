@@ -74,7 +74,7 @@ function addEvents(document){
         if (keycode == 85) move(bear2, front);//u
         if (keycode == 79) move(bear2, back);//o
 
-        if (keycode == 32) bear1.setAction('JumpUp');//space
+        if (keycode == 32) bear2.setAction('StandUp');//space
     }
 }
 
