@@ -32,21 +32,21 @@ function JumpUp(obj){
 }
 
 function StandUp(obj){
-    for(i=18-1;i>=0;i--){
+    
+    for(i=90-1;i>=0;i--){
         obj.actionList.push([function(obj,i){
             leftLeg=obj.get['leftLeg'];
             rightLeg=obj.get['rightLeg'];
             leftFoot=obj.get['leftFoot'];
-            legLength=leftLeg.lengthz()+leftFoot.lengthz();
-            leftLeg.theta[0]-=dtheta;
-            rightLeg.theta[0]-=dtheta;
-            b=transpose(leftFoot.calCMT())[2];
-            a=dot(b,vec4(leftFoot.centerPos,0))
-            if(a<=0){//触碰地面
-                obj.offset[1]-=legLength*Math.sin(radians(dtheta*i));
-                obj.offset[2]-=legLength*(1-Math.cos(radians(dtheta*i)));
-                obj.offset[1]+=legLength*Math.sin(radians(dtheta*(i+1)));
-                obj.offset[2]+=legLength*(1-Math.cos(radians(dtheta*(i+1))));
+            legLength=leftLeg.lengthz()+leftFoot.lengthz()/2;
+            leftLeg.theta[0]-=1;
+            rightLeg.theta[0]-=1;
+            
+            if(legLength*Math.sin(radians(i))>=0.2){//触碰地面
+                obj.offset[1]-=legLength*Math.sin(radians(i));
+                obj.offset[2]-=legLength*(1-Math.cos(radians(i)));
+                obj.offset[1]+=legLength*Math.sin(radians((i+1)));
+                obj.offset[2]+=legLength*(1-Math.cos(radians((i+1))));
             }
         },i]);
     }
