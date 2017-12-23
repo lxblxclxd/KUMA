@@ -46,35 +46,46 @@ function addEvents(document){
         var keycode = event.keyCode;
         var realkey = String.fromCharCode(event.keyCode);
 
-        phiold = phi;
+        if (keycode == 87) move(character, front);//w
+        if (keycode == 65) move(becharacterar1, left);//a
+        if (keycode == 83) move(character, back);//s
+        if (keycode == 68) move(character, right);//d
 
-        //camera
-        if (keycode == 33) radius += 1.0;//pageup
-        if (keycode == 34) if (radius > 1.0) radius -= 1.0;//pagedown
-        if (keycode == 37) theta += dr;//leftArrow
-        if (keycode == 38) { (phi -= dr) % Math.PI; if (phi < -Math.PI) phi += 2 * Math.PI }//upArrow
-        if (keycode == 39) { theta -= dr; theta %= (Math.PI * 2); }//rightArrow
-        if (keycode == 40) { (phi += dr) % Math.PI; if (phi > Math.PI) phi -= 2 * Math.PI; }//downArrow
-        if ((phiold > 0 && phi < -0) || (phiold < -0 && phi > 0))
-            up[yAxis] = -up[yAxis];
+        if(realkey=='1'){
+            character=bear1; 
+        } 
+        if(realkey=='2'){
+            character=bear2;
+        }
 
-        //bear1
-        if (keycode == 87) move(bear1, upward);//w
-        if (keycode == 65) move(bear1, left);//a
-        if (keycode == 83) move(bear1, down);//s
-        if (keycode == 68) move(bear1, right);//d
-        if (keycode == 81) move(bear1, front);//q
-        if (keycode == 69) move(bear1, back);//e
+        if (keycode == 32) character.setAction('JumpUp');//space
+        
+        camera.attach(character);
+    }
 
-        //bear2
-        if (keycode == 73) move(bear2, upward);//i
-        if (keycode == 74) move(bear2, left);//j
-        if (keycode == 75) move(bear2, down);//k
-        if (keycode == 76) move(bear2, right);//l
-        if (keycode == 85) move(bear2, front);//u
-        if (keycode == 79) move(bear2, back);//o
+    //鼠标监听控制视角(Camera)
+    mouseX = event.clientX;  
+    mouseY = event.clientY;  
+    document.onmousemove = function(){
+        var ctrlKey = event.ctrlKey || event.metaKey;
+        mouseXLast=mouseX;
+        mouseYLast=mouseY;
+        mouseX = event.clientX;  
+        mouseY = event.clientY;
+        // if(ctrlKey&&mouseX<mouseXLast) theta -=dr;
+        // if(ctrlKey&&) theta += dr;
+        if(ctrlKey)
+        camera.theta+=(mouseX-mouseXLast)/200;
+        if (ctrlKey&&mouseY<mouseYLast) { if(camera.phi<Math.PI/2) camera.phi+=dr;}
+        if (ctrlKey&&mouseY>mouseYLast) {if(camera.phi>0.5) camera.phi -= dr; }
+        camera.theta %= (Math.PI * 2);
+    }
 
-        if (keycode == 32) bear2.setAction('StandUp');//space
+    document.onmousewheel = function(){
+        direction=event.wheelDelta>0?-1.0:1.0;
+        camera.radius+=direction;
+        if(camera.radius<=0.0)
+            camera.radius+=1.0;
     }
 }
 

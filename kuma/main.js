@@ -14,51 +14,42 @@ var precise = 10;//精度
 var bear1 = new SceneObject();
 var bear2 = new SceneObject();
 var dotLight = new SceneObject();
+var camera_default= new Camera();
 
-function SceneObject() {
-    this.points = [];
-    this.colors = [];
-    this.normals=[];//法向量normal vectors
-    this.texs=[];
-    this.tags = [new Tag()];//(type,start,numOfPoints,colorRaw(vec4)) 
-                                   //type 1 for Triangles,type 3 for Triangle_Strip;
-    this.offset = [0, 0, 0];//position of current object
-    this.theta = [0, 0, 0];//direction and speed the object rotates
-    this.rMat = mat4();
-    this.vBuffer = null;
-    this.vPosition = null;
-    this.nBuffer=null;
-    this.vNormal=null;
-    this.tBuffer=null;
-    this.vTexCoord=null;
+var camera=camera_default;
+var character=bear1;
+// var thetaTest=-135;
+// var direction=5;
+// var jumpHeight=0;
+// var directionj=0.5;
 
-    this.get=null;
-    this.actionList=[];
-    this.setAction=function(action){//设置执行一个动作
-        setAction(this,action);
-    }   
-    this.nextAction=function(){//得出执行动作后的下一步状态
-        nextAction(this);
-    }   
-}
-
-var thetaTest=-135;
-var direction=5;
-var jumpHeight=0;
-var directionj=0.5;
-//data for perspective
-var near = 0.3;
-var far = 30.0;
-var radius = 2.0;
-var theta = Math.PI / 2;
-var phi = Math.PI / 2;
 var dr = 5.0 * Math.PI / 180.0;
-var fovy = 45.0;  // Field-of-view in Y direction angle (in degrees)
-var aspect;       // Viewport aspect ratio
-var eye;
-const at = vec3(0.0, 0.0, 0.0);
-const up = vec3(0.0, 1.0, 0.0);
+function Camera() {
+    this.near = 0.3;
+    this.far = 30.0;
+    this.fovy = 45.0;  // Field-of-view in Y direction angle (in degrees)
+    this.aspect;       // Viewport aspect ratio
 
+    this.radius = 2.0;
+    this.theta = -Math.PI / 2;
+    this.phi = Math.PI / 2;
+    this.eye;
+    this.at = vec3(0.0, 0.0, 0.0);
+    this.up = vec3(0.0, 1.0, 0.0);
+
+    this.calModelViewMat = function(){
+        this.eye = add(vec3(this.radius * Math.sin(this.phi) * Math.cos(this.theta),
+        this.radius * Math.cos(this.phi),
+        this.radius * Math.sin(this.phi) * Math.sin(this.theta)),this.at);
+        return lookAt(this.eye, this.at, this.up);
+    }
+    this.calPerspectiveMat = function(){
+       return perspective(this.fovy, this.aspect, this.near, this.far);
+    }
+    this.attach = function(obj){
+        this.at=vec3(obj.offset);
+    }
+}
 var cmtLoc,normalMatrixLoc,modelView, projection;
 
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
@@ -67,7 +58,7 @@ var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
-    aspect = canvas.width / canvas.height;
+    camera.aspect = canvas.width / canvas.height;
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) { alert("WebGL isn't available"); }
@@ -114,7 +105,6 @@ window.onload = function init() {
 
     image0 = document.getElementById("texImage3");
     configureTexture( image0,0 );
-
     image1 = document.getElementById("texImage5");
     configureTexture( image1,1 );
     
@@ -198,20 +188,16 @@ function render() {
 
     //view
     //theta+=dr;
-    if(thetaTest>-45)
-        direction=-5;
-    if(thetaTest<-135)
-        direction=5;
-    thetaTest+=direction;
-    eye = vec3(radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.cos(phi),
-        radius * Math.sin(phi) * Math.sin(theta));
-    mvMatrix = lookAt(eye, at, up);
-    pMatrix = perspective(fovy, aspect, near, far);
+    // if(thetaTest>-45)
+    //     direction=-5;
+    // if(thetaTest<-135)
+    //     direction=5;
+    // thetaTest+=direction;
     
-    gl.uniformMatrix4fv(modelView, false, flatten(mvMatrix));
-    gl.uniformMatrix4fv(projection, false, flatten(pMatrix));
-    gl.uniform4fv( gl.getUniformLocation(program,"lightPosition"),flatten(vec4(dotLight.offset,0)));
+    
+    gl.uniformMatrix4fv(modelView, false, flatten(camera.calModelViewMat()));
+    gl.uniformMatrix4fv(projection, false, flatten(camera.calPerspectiveMat()));
+    gl.uniform4fv(gl.getUniformLocation(program,"lightPosition"),flatten(vec4(dotLight.offset,0)));
 
     //two bears
     gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,0)) );
@@ -285,12 +271,11 @@ function render() {
     gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
 
     m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
-    mvMatrix = mult(mvMatrix, translate(dotLight.offset));
+    mvMatrix = mult(camera.calModelViewMat(), translate(dotLight.offset));
     mvMatrix = mult(mvMatrix, m);
     mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
 
     gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix));
-    gl.uniformMatrix4fv( projection, false, flatten(pMatrix));
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear1.rMat));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));

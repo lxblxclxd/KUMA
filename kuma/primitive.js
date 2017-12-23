@@ -9,7 +9,7 @@ pink = [255 / 255, 128 / 255, 255 / 255,1.0];
 color_undefined=[0.0,0.0,0.0,0.0];
 
 
-function Tag(type,start,numOfPoints,colorRaw) {
+function Component(type,start,numOfPoints,colorRaw) {
   if (arguments.length == 0) {
     type=0;
     start=0;
@@ -63,29 +63,6 @@ function sphere(points,normals,texs,tags,x,y,z,radis,color)
   return ellipsoid(points,normals,texs,tags,x,y,z,radis,radis,radis,color);
 }
 
-/*
-function circleXY(points,texs,tags,x,y,z,radis,color)//平行于xy平面
-{
-  for(var i=0;i<360;i++){
-    px=x+radis*Math.cos(i/360*6.28);
-    py=y+radis*Math.sin(i/360*6.28);
-    pz=z;
-    points.push(vec3(px,py,pz));
-  }
-  return addTag(tags,color,2,360);
-}
-
-function circleXZ(points,texs,tags,x,y,z,radis,color)//平行于xz平面
-{
-  for(var i=0;i<360;i++){
-    px=x+radis*Math.cos(i/360*6.28);
-    py=y;
-    pz=z+radis*Math.sin(i/360*6.28);
-    points.push(vec3(px,py,pz));
-  }
-  return addTag(tags,color,2,360);
-}
-*/
 function cylinderX(points,normals,texs,tags,x,y,z,radis,height,color)//柱面，中心轴平行于x轴
 {
 }
@@ -110,18 +87,14 @@ function cylinderZ(points,normals,texs,tags,x,y,zback,zfront,radis,color)//柱�
     normals.push(vec3(rx,ry,0),vec3(rx,ry,0));
     texzback=0.0;
     texzfront=1.0;
-    texy=i/360;
-    
+    texy=i/360;    
     texs.push(vec2(texzback,texy),vec2(texzfront,texy));
   }
   z=(zback+zfront)/2;
   stdPos=[
-    vec3(x,y+radis,z),
-    vec3(x,y-radis,z),
-    vec3(x-radis,y,z),
-    vec3(x+radis,y,z),
-    vec3(x,y,zfront),
-    vec3(x,y,zback),
+    vec3(x,y+radis,z),vec3(x,y-radis,z),
+    vec3(x-radis,y,z),vec3(x+radis,y,z),
+    vec3(x,y,zfront),vec3(x,y,zback),
     vec3(x,y,z)
    ];
   return addTag(tags,color,3,2*361,stdPos);
@@ -136,6 +109,7 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
     theta2=j/360*2*Math.PI;
     for(var i=0;i<=360;i+=precise){
       theta1=i/360*2*Math.PI;
+      //对于点，法向量和贴图映射关系的计算
       rx=Math.sin(theta2)*Math.cos(theta1);
       ry=Math.sin(theta2)*Math.sin(theta1);
       rz=Math.cos(theta2);
@@ -148,19 +122,15 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
       var texx,texy,texxd,texyd;
       texy=0.5+ry/2;
       texyd=0.5+ryd/2;
-      if(rz>=0){
+      if(rz>=0)
         texx=rx/2+0.5;
-      }
-      else{
+      else
         texx=1.5-rx/2;
-      }
-      if(rzd>=0){
+      if(rzd>=0)
         texxd=rxd/2+0.5;
-      }
-      else{
+      else
         texxd=1.5-rxd/2;
-      }
-      if(j==91){
+      if(j==91){//解决贴图边界的错误问题
         texx=texxd;
         texy=texyd;
       }
@@ -172,17 +142,13 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
     }
    }
    stdPos=[
-    vec3(x,y+b,z),
-    vec3(x,y-b,z),
-    vec3(x-a,y,z),
-    vec3(x+a,y,z),
-    vec3(x,y,z+c),
-    vec3(x,y,z-c),
+    vec3(x,y+b,z),vec3(x,y-b,z),
+    vec3(x-a,y,z),vec3(x+a,y,z),
+    vec3(x,y,z+c),vec3(x,y,z-c),
     vec3(x,y,z)
    ];
    return addTag(tags,color,3,180*(360+precise)*2/precise/precise,stdPos);
 }
-
 
 // function parabola(p1,p2,p3,n){//X(a,b,c)=y n个点的xy平面抛物线y=ax2+bx+c
 //   X=mat3(p1[0]*p1[0],p1[0],1,
@@ -204,11 +170,11 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
 // }
 
 
-function addTag(tags,color,type,length,stdPos)//(type,start,numOfPoints) type 1 for Triangles,type 3 for Triangle_Strip;
+function addTag(tags,color,type,length,stdPos)//增加当前部件的标签
 {
     tagLast=tags[tags.length-1];
     start=tagLast.start+tagLast.numOfPoints;
-    tagThis=new Tag(type,start,length,color);
+    tagThis=new Component(type,start,length,color);
     if(stdPos.length==7){  
       tagThis.upPos    =stdPos[0];
       tagThis.downPos  =stdPos[1];
@@ -216,8 +182,7 @@ function addTag(tags,color,type,length,stdPos)//(type,start,numOfPoints) type 1 
       tagThis.rightPos =stdPos[3];
       tagThis.frontPos =stdPos[4];
       tagThis.backPos  =stdPos[5];
-      tagThis.centerPos=stdPos[6];
-      
+      tagThis.centerPos=stdPos[6];  
     }
     tags.push(tagThis);
     return tagThis;

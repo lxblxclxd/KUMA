@@ -1,14 +1,35 @@
-//functions for drawing a bear
+function SceneObject() {
+  this.points = [];
+  this.colors = [];
+  this.normals=[];//法向量normal vectors
+  this.texs=[];
+  this.tags = [new Component()];//(type,start,numOfPoints,colorRaw(vec4)) 
+                                 //type 1 for Triangles,type 3 for Triangle_Strip;
+  this.offset = [0, 0, 0];//position of current object
+  this.theta = [0, 0, 0];//direction and speed the object rotates
+  this.rMat = mat4();
+  this.vBuffer = null;
+  this.vPosition = null;
+  this.nBuffer=null;
+  this.vNormal=null;
+  this.tBuffer=null;
+  this.vTexCoord=null;
 
-function bear(points,normals,texs,tags){
-    a=Object.prototype.toString.call(points);
-    if(a== "[object Object]"){//function bear(bear) 
-      obj=points;
-      tags=obj.tags;
-      texs=obj.texs;
-      normals=obj.normals;
-      points=obj.points;
-    }
+  this.get=null;
+  this.actionList=[];
+  this.setAction=function(action){//设置执行一个动作
+      setAction(this,action);
+  }   
+  this.nextAction=function(){//得出执行动作后的下一步状态
+      nextAction(this);
+  }   
+}
+
+function bear(obj){
+    tags=obj.tags;
+    texs=obj.texs;
+    normals=obj.normals;
+    points=obj.points;
     //计算points，normals和texs并设置颜色
     //左右区分按照熊自身的位置，如左手在我们默认视角的右侧
     head      = sphere(points,normals,texs,tags,0,0.3,0,0.2,color_undefined);//face
@@ -50,14 +71,11 @@ function bear(points,normals,texs,tags){
     //leftLeg.theta=[-135,0,0];
 }
 
-function  sun(points,normals,texs,tags){
-  a=Object.prototype.toString.call(points);
-  if(a== "[object Object]"){//function bear(bear)
-    tags=points.tags;
-    texs=points.texs;
-    normals=points.normals;
-    points=points.points;
-  }
+function  sun(obj){
+  tags=obj.tags;
+  texs=obj.texs;
+  normals=obj.normals;
+  points=obj.points;
   sphere(points,normals,texs, tags,0,0,0,0.2,red);
 }
 
