@@ -20,7 +20,7 @@ function Component(type,start,numOfPoints,colorRaw) {
   this.type=type;
   this.start=start;
   this.numOfPoints=numOfPoints;
-  this.colorRaw=colorRaw;
+  this.colorRaw=colorRaw;//直接显示的颜色
 
   this.theta=[0,0,0];//离初始位置的偏转角度在三个方向的分量
   this.rootPos=vec3();//物体旋转所绕的点

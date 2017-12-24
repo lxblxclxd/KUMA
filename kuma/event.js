@@ -5,7 +5,7 @@ down = [0.0, -0.05, 0.0];
 left = [0.05, 0.0, 0.0];
 right = [-0.05, 0.0, 0.0];
 
-function addEvents(document){
+function addEvents(){
     //event listeners for buttons
     document.getElementById("xRButton").onclick = function () { bear1.theta[xAxis] = (bear1.theta[xAxis] + 5.0) % 10; };
     document.getElementById("yRButton").onclick = function () { bear1.theta[yAxis] = (bear1.theta[yAxis] + 5.0) % 10; };
@@ -47,7 +47,7 @@ function addEvents(document){
         var realkey = String.fromCharCode(event.keyCode);
 
         if (keycode == 87) move(character, front);//w
-        if (keycode == 65) move(becharacterar1, left);//a
+        if (keycode == 65) move(character, left);//a
         if (keycode == 83) move(character, back);//s
         if (keycode == 68) move(character, right);//d
 

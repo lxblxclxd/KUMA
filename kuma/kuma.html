@@ -83,10 +83,8 @@ main()
   else 
   if(bTexCoord==1)
     fcolor=ambient+Kd*texture2D(texture0,vec2(s,t))+specular;
-    //fcolor=texture2D(texture0,vec2(s,t));
   else if(bTexCoord==2)
     fcolor=ambient+Kd*texture2D(texture1,vec2(s,t))+specular;
-    //fcolor=texture2D(texture1,vec2(s,t));
   fcolor.a=1.0;
   if(colorDirect.w==1.0) fcolor=colorDirect;
     gl_FragColor = fcolor;
@@ -96,6 +94,7 @@ main()
   <script type="text/javascript" src="../Common/webgl-utils.js"></script>
   <script type="text/javascript" src="../Common/initShaders.js"></script>
   <script type="text/javascript" src="../Common/MV.js"></script>
+  <script type="text/javascript" src="../kizunaai/kizunaai.js"></script>
   <script type="text/javascript" src="primitive.js"></script>
   <script type="text/javascript" src="object.js"></script>
   <script type="text/javascript" src="event.js"></script>

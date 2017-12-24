@@ -103,12 +103,13 @@ window.onload = function init() {
     dotLight.offset=[0.0, 1.0, 3.0];
     sendData(dotLight);
 
+    camera.attach(bear1);
     image0 = document.getElementById("texImage3");
     configureTexture( image0,0 );
     image1 = document.getElementById("texImage5");
     configureTexture( image1,1 );
-    
-    addEvents(document);
+
+    addEvents();
     
     render();
 };
@@ -143,16 +144,12 @@ function prepareData(){
 
 }
 
-function drawTags(tags)
+function drawObjects(obj)
 {
-    for(var i=1;i<tags.length;i++){
-        tag=tags[i];
+    for(var i=1;i<obj.tags.length;i++){
+        tag=obj.tags[i];
         gl.uniform1i(gl.getUniformLocation(program, "bTexCoord"), i);
         gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(tag.colorRaw));
-        if(i==1)
-            gl.activeTexture(gl.TEXTURE0);
-        else
-            gl.activeTexture(gl.TEXTURE1);
         // if(i==5||i==7)
         //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
         // else if(i==6||i==8)
@@ -227,7 +224,7 @@ function render() {
     gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(diffuseProduct));
     gl.uniform4fv(gl.getUniformLocation(program,"specularProduct"),flatten(specularProduct));
     gl.uniform1f( gl.getUniformLocation(program,"shininess"),materialShininess );
-    drawTags(bear1.tags);
+    drawObjects(bear1);
 
     bear2.rMat = rotates(bear2.rMat, bear2.theta);
     //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear2.offset), bear2.rMat)));
@@ -255,7 +252,7 @@ function render() {
     gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(diffuseProduct));
     gl.uniform4fv(gl.getUniformLocation(program,"specularProduct"),flatten(specularProduct));
     gl.uniform1f( gl.getUniformLocation(program,"shininess"),materialShininess );
-    drawTags(bear2.tags);
+    drawObjects(bear2);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //lightdot
@@ -265,7 +262,7 @@ function render() {
     gl.bindBuffer(gl.ARRAY_BUFFER, dotLight.vBuffer);
     gl.vertexAttribPointer(dotLight.vPosition, 3, gl.FLOAT, false, 0, 0);
 
-    drawTags(dotLight.tags);
+    drawObjects(dotLight);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     //shadow
     gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
@@ -281,13 +278,13 @@ function render() {
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));
     gl.bindBuffer( gl.ARRAY_BUFFER, bear1.vBuffer );
     gl.vertexAttribPointer( bear1.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    drawTags(bear1.tags);
+    drawObjects(bear1);
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear2.rMat));
     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear2.offset)));
     gl.bindBuffer( gl.ARRAY_BUFFER, bear2.vBuffer );
     gl.vertexAttribPointer( bear2.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    drawTags(bear2.tags);
+    drawObjects(bear2);
 
     window.requestAnimFrame(render);
 

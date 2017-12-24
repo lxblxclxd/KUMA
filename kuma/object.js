@@ -79,7 +79,3 @@ function  sun(obj){
   sphere(points,normals,texs, tags,0,0,0,0.2,red);
 }
 
-
-
-
-
