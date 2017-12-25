@@ -71,34 +71,83 @@ function cylinderY(points,normals,texs,tags,x,y,z,radis,height,color)//柱面，
 {
 }
 
-function cylinderZ(points,normals,texs,tags,x,y,zback,zfront,radis,color)//柱面，中心轴平行于z轴
-{
-  if(zback>zfront){
-    zback = [zfront,zfront=zback][0];//交换zback与zfront的值
-  }
-  var theta;
-  for(var i=0;i<=360;i++){
-    theta=i/360*2*Math.PI;
-    rx=Math.cos(theta);
-    ry=Math.sin(theta);
-    px=x+radis*rx;
-    py=y+radis*ry;
-    points.push(vec3(px,py,zback),vec3(px,py,zfront));
-    normals.push(vec3(rx,ry,0),vec3(rx,ry,0));
-    texzback=0.0;
-    texzfront=1.0;
-    texy=i/360;    
-    texs.push(vec2(texzback,texy),vec2(texzfront,texy));
-  }
-  z=(zback+zfront)/2;
-  stdPos=[
-    vec3(x,y+radis,z),vec3(x,y-radis,z),
-    vec3(x-radis,y,z),vec3(x+radis,y,z),
-    vec3(x,y,zfront),vec3(x,y,zback),
+function cylinderZ(points,normals,texs,tags,x,y,zback,zfront,radis,color){//柱面，中心轴平行于z轴
+  return circularZ(points,normals,texs,tags,x,y,zback,zfront,radis,radis,color);
+}
+
+function coneY(points,normals,texs,tags,x,z,ybottom,ytop,radis,color){//圆锥面，中心轴平行于y轴
+  var tag=circularZ(points,normals,texs,tags,x,z,ybottom,ytop,radis,0,color);
+  tag.theta=[90,0,0];
+  return tag;
+}
+
+function coneZ(points,normals,texs,tags,x,y,zback,zfront,radis,color){//圆锥面，中心轴平行于z轴
+  return circularZ(points,normals,texs,tags,x,y,zback,zfront,radis,0,color);
+}
+
+function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,color){//圆台面，中心轴平行于z轴
+    if(zback>zfront){
+      zback = [zfront,zfront=zback][0];//交换zback与zfront的值
+      rback = [rfront,rfront=rback][0];
+    }
+    var theta;
+    var theta1=Math.atan((rback-rfront)/2/(zfront-zback));
+    nx=rx*Math.cos(theta1);
+    ny=ry*Math.cos(theta1);
+    nz=Math.sin(theta1);
+    for(var i=0;i<=360;i++){
+      theta=i/360*2*Math.PI;
+      rx=Math.cos(theta);
+      ry=Math.sin(theta);
+      
+      points.push(vec3(x+rback*rx,y+rback*ry,zback),vec3(x+rfront*rx,y+rfront*ry,zfront));
+      normals.push(vec3(nx,ny,nz),vec3(nx,ny,nz));
+      texy=i/360;    
+      texs.push(vec2(0.0,texy),vec2(1.0,texy));
+    }
+    z=(zback+zfront)/2;
+    radis=(rback+rfront)/2;
+    stdPos=[
+      vec3(x,y+radis,z),vec3(x,y-radis,z),
+      vec3(x-radis,y,z),vec3(x+radis,y,z),
+      vec3(x,y,zfront),vec3(x,y,zback),
+      vec3(x,y,z)
+     ];
+    return addTag(tags,color,3,2*361,stdPos);
+}
+
+function wheelXZ(points,normals,texs,tags,x,y,z,r1,r2,color){
+  for(var j=0;j<360;j+=precise){
+    theta2=j/360*2*Math.PI;
+    for(var i=0;i<=360;i+=precise){
+      theta1=i/360*2*Math.PI;
+      //对于点，法向量和贴图映射关系的计算
+      px=x+(r1+r2*Math.cos(theta1))*Math.cos(theta2);
+      py=y+r2*Math.sin(theta1);
+      pz=z+(r1+r2*Math.cos(theta1))*Math.sin(theta2);
+      pxd=x+(r1+r2*Math.cos(theta1))*Math.cos(theta2+precise/360*2*Math.PI);
+      pyd=y+r2*Math.sin(theta1);
+      pzd=z+(r1+r2*Math.cos(theta1))*Math.sin(theta2+precise/360*2*Math.PI);
+      nx=Math.cos(theta1)*Math.cos(theta2);
+      ny=Math.sin(theta1);
+      nz=Math.cos(theta1)*Math.sin(theta2);
+      nxd=Math.cos(theta1)*Math.cos(theta2+precise/360*2*Math.PI);
+      nyd=Math.sin(theta1);
+      nzd=Math.cos(theta1)*Math.sin(theta2+precise/360*2*Math.PI);
+      points.push(vec3(px,py,pz),vec3(pxd,pyd,pzd));
+      normals.push(vec3(nx,ny,nz),vec3(pxd,pyd,pzd));
+      texs.push(vec2(j/360,i/360),vec2(j+1/360,i/360));
+    }
+   }
+   stdPos=[
+    vec3(x,y+r2,z),vec3(x,y-r2,z),
+    vec3(x-r1-r2,y,z),vec3(x+r1+r2,y,z),
+    vec3(x,y,z+r1+r2),vec3(x,y,z-r1-r2),
     vec3(x,y,z)
    ];
-  return addTag(tags,color,3,2*361,stdPos);
+   return addTag(tags,color,3,2*360*(360+precise)/precise/precise,stdPos);
 }
+
 
 function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
 {

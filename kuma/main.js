@@ -9,12 +9,17 @@ var xAxis = 0;
 var yAxis = 1;
 var zAxis = 2;
 
-var precise = 10;//精度
+var vPosition, vNormal, vTexCoord;//对应html文件中的变量
+
+var precise = 5;//精度
 
 var bear1 = new SceneObject();
 var bear2 = new SceneObject();
 var dotLight = new SceneObject();
 var camera_default= new Camera();
+
+var hat1 = new SceneObject(); 
+var hat2 = new SceneObject(); 
 
 var camera=camera_default;
 var character=bear1;
@@ -50,7 +55,6 @@ function Camera() {
         this.at=vec3(obj.offset);
     }
 }
-var cmtLoc,normalMatrixLoc,modelView, projection;
 
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
@@ -80,11 +84,10 @@ window.onload = function init() {
 
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram( program );
-
-    cmtLoc = gl.getUniformLocation(program, "cmt");
-    modelView = gl.getUniformLocation(program, "modelView");
-    projection = gl.getUniformLocation(program, "projection");
-    normalMatrixLoc=gl.getUniformLocation(program,"normalMatrix");
+    
+    vPosition = gl.getAttribLocation(program, "vPosition");
+    vNormal = gl.getAttribLocation( program, "vNormal" );
+    vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
 
 
     // Create a buffer object, initialize it, and associate it with the
@@ -98,6 +101,14 @@ window.onload = function init() {
     bear(bear2);
     bear2.offset=[0.35, 0.2, 0];
     sendData(bear2);
+
+    christmasHat(hat1);
+    hat1.offset=[-0.35, 0.7, 0];
+    sendData(hat1);
+
+    christmasHat(hat2);
+    hat2.offset=[0.35, 0.7, 0];
+    sendData(hat2);
 
     sun(dotLight);
     dotLight.offset=[0.0, 1.0, 3.0];
@@ -115,36 +126,48 @@ window.onload = function init() {
 };
 
 function sendData(obj){
-    obj.vBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.points), gl.STATIC_DRAW);
+    obj.vBuffer = gl.createBuffer();//创建缓存区
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer);//绑定缓存区
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.points), gl.STATIC_DRAW);//向缓存区传输数据
 
-    obj.vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(obj.vPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(obj.vPosition);
+    if(!obj.colorDirect){    
+        obj.nBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normals), gl.STATIC_DRAW);
 
-    obj.nBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normals), gl.STATIC_DRAW);
-
-    obj.vNormal = gl.getAttribLocation( program, "vNormal" );
-    gl.vertexAttribPointer( obj.vNormal, 3, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( obj.vNormal);
-
-    obj.tBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.texs), gl.STATIC_DRAW);
-
-    obj.vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
-    gl.vertexAttribPointer( obj.vTexCoord, 2, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( obj.vTexCoord);
+        obj.tBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.texs), gl.STATIC_DRAW);
+    }
 }
 
-function prepareData(){
+function prepareData(obj){
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer);//绑定对应缓存区
+    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);//从该缓存区中取数
+    gl.enableVertexAttribArray(vPosition);//开启取数
 
+    if(!obj.colorDirect){
+        gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
+        gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray( vNormal);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
+        gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray( vTexCoord);
+
+        gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,0)) );
+    }
+    else{
+        gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(obj.colorDirect));
+        gl.disableVertexAttribArray( vNormal);
+        gl.disableVertexAttribArray( vTexCoord);
+    }
+
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(obj.rMat));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(obj.offset)));
 }
 
-function drawObjects(obj)
+function drawObject(obj)
 {
     for(var i=1;i<obj.tags.length;i++){
         tag=obj.tags[i];
@@ -164,6 +187,20 @@ function drawObjects(obj)
         if(tag.type==3)
             gl.drawArrays( gl.TRIANGLE_STRIP, tag.start, tag.numOfPoints);
     }
+}
+
+function drawShadow(obj){
+    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
+    m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
+    mvMatrix = mult(camera.calModelViewMat(), translate(dotLight.offset));
+    mvMatrix = mult(mvMatrix, m);
+    mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
+    gl.uniformMatrix4fv( gl.getUniformLocation(program, "modelView"), false, flatten(mvMatrix));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(obj.rMat));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(obj.offset)));
+    gl.bindBuffer( gl.ARRAY_BUFFER, obj.vBuffer );
+    gl.vertexAttribPointer( bear1.vPosition, 3, gl.FLOAT, false, 0, 0 );
+    drawObject(obj);
 }
 
 function rotates(mat, theta,center){//原矩阵根据角度和旋转中心左乘旋转矩阵
@@ -191,25 +228,15 @@ function render() {
     //     direction=5;
     // thetaTest+=direction;
     
-    
-    gl.uniformMatrix4fv(modelView, false, flatten(camera.calModelViewMat()));
-    gl.uniformMatrix4fv(projection, false, flatten(camera.calPerspectiveMat()));
+    //camera and light
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "modelView"), false, flatten(camera.calModelViewMat()));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, flatten(camera.calPerspectiveMat()));
     gl.uniform4fv(gl.getUniformLocation(program,"lightPosition"),flatten(vec4(dotLight.offset,0)));
 
     //two bears
-    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,0)) );
     bear1.rMat = rotates(bear1.rMat, bear1.theta);
-    //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear1.offset), bear1.rMat)));
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear1.rMat));
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));
     bear1.nextAction();
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear1.vBuffer);
-    gl.vertexAttribPointer(bear1.vPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear1.nBuffer);
-    gl.vertexAttribPointer(bear1.vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear1.tBuffer);
-    gl.vertexAttribPointer(bear1.vTexCoord, 2, gl.FLOAT, false, 0, 0);
+    prepareData(bear1);
     
     materialAmbient = vec4( 0.4, 0.4, 0.4, 1.0 );
     materialDiffuse = vec4( 88/255,88/255,88/255,1.0);//red
@@ -224,20 +251,11 @@ function render() {
     gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(diffuseProduct));
     gl.uniform4fv(gl.getUniformLocation(program,"specularProduct"),flatten(specularProduct));
     gl.uniform1f( gl.getUniformLocation(program,"shininess"),materialShininess );
-    drawObjects(bear1);
+    drawObject(bear1);
 
     bear2.rMat = rotates(bear2.rMat, bear2.theta);
-    //gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(bear2.offset), bear2.rMat)));
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear2.rMat));
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear2.offset)));
     bear2.nextAction();
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear2.vBuffer);
-    gl.vertexAttribPointer(bear2.vPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear2.nBuffer);
-    gl.vertexAttribPointer(bear2.vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bear2.tBuffer);
-    gl.vertexAttribPointer(bear2.vTexCoord, 2, gl.FLOAT, false, 0, 0);
+    prepareData(bear2);
 
     materialAmbient = vec4( 0.4, 0.4, 0.4, 1.0 );
     materialDiffuse = vec4( 128/255, 64/255, 0.0,1.0);//brown
@@ -252,39 +270,21 @@ function render() {
     gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(diffuseProduct));
     gl.uniform4fv(gl.getUniformLocation(program,"specularProduct"),flatten(specularProduct));
     gl.uniform1f( gl.getUniformLocation(program,"shininess"),materialShininess );
-    drawObjects(bear2);
+    drawObject(bear2);
 
+    prepareData(hat1);
+    drawObject(hat1);
+
+    prepareData(hat2);
+    drawObject(hat2);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //lightdot
-    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(1,0,0,1)) );
-    gl.uniformMatrix4fv(cmtLoc, false, flatten(mult(translate(dotLight.offset), dotLight.rMat)));  
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, dotLight.vBuffer);
-    gl.vertexAttribPointer(dotLight.vPosition, 3, gl.FLOAT, false, 0, 0);
-
-    drawObjects(dotLight);
+    prepareData(dotLight);
+    drawObject(dotLight);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     //shadow
-    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
-
-    m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
-    mvMatrix = mult(camera.calModelViewMat(), translate(dotLight.offset));
-    mvMatrix = mult(mvMatrix, m);
-    mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
-
-    gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix));
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear1.rMat));
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear1.offset)));
-    gl.bindBuffer( gl.ARRAY_BUFFER, bear1.vBuffer );
-    gl.vertexAttribPointer( bear1.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    drawObjects(bear1);
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_R"), false, flatten(bear2.rMat));
-    gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmt_T"), false, flatten(translate(bear2.offset)));
-    gl.bindBuffer( gl.ARRAY_BUFFER, bear2.vBuffer );
-    gl.vertexAttribPointer( bear2.vPosition, 3, gl.FLOAT, false, 0, 0 );
-    drawObjects(bear2);
+    drawShadow(bear1);
+    drawShadow(bear2);
 
     window.requestAnimFrame(render);
 
@@ -304,5 +304,4 @@ function configureTexture( image ,i ) {
                         gl.NEAREST_MIPMAP_LINEAR );
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
     gl.uniform1i(gl.getUniformLocation(program, "texture"+i), i);
-    
 }

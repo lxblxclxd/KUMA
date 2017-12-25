@@ -9,11 +9,8 @@ function SceneObject() {
   this.theta = [0, 0, 0];//direction and speed the object rotates
   this.rMat = mat4();
   this.vBuffer = null;
-  this.vPosition = null;
   this.nBuffer=null;
-  this.vNormal=null;
   this.tBuffer=null;
-  this.vTexCoord=null;
 
   this.get=null;
   this.actionList=[];
@@ -32,16 +29,16 @@ function bear(obj){
     points=obj.points;
     //计算points，normals和texs并设置颜色
     //左右区分按照熊自身的位置，如左手在我们默认视角的右侧
-    head      = sphere(points,normals,texs,tags,0,0.3,0,0.2,color_undefined);//face
-    body      = ellipsoid(points,normals,texs,tags,0,0,0,0.27,0.2,0.2,color_undefined);//body
-    leftHand  = ellipsoid(points,normals,texs,tags,0.27,0,0,0.05,0.08,0.05,black);//left hand
-    rightHand = ellipsoid(points,normals,texs,tags,-0.27,0,0,0.05,0.08,0.05,white);//right hand
-    leftLeg   = cylinderZ(points,normals,texs,tags,0.15,-0.08,0.0,0.3,0.07,black);//left leg
-    rightLeg  = cylinderZ(points,normals,texs,tags,-0.15,-0.08,0.0,0.3,0.07,white);//right leg
-    leftFoot  = ellipsoid(points,normals,texs,tags,0.15,-0.08,0.3,0.07,0.09,0.07,black);//left foot
-    rightFoot = ellipsoid(points,normals,texs,tags,-0.15,-0.08,0.3,0.07,0.09,0.07,white);//right foot
-    leftEar   = sphere(points,normals,texs,tags,0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,black);//left ear
-    rightEar  = sphere(points,normals,texs,tags,-0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,white);//right ear
+    var head      = sphere(points,normals,texs,tags,0,0.3,0,0.2,color_undefined);//face
+    var body      = ellipsoid(points,normals,texs,tags,0,0,0,0.27,0.2,0.2,color_undefined);//body
+    var leftHand  = ellipsoid(points,normals,texs,tags,0.27,0,0,0.05,0.08,0.05,black);//left hand
+    var rightHand = ellipsoid(points,normals,texs,tags,-0.27,0,0,0.05,0.08,0.05,white);//right hand
+    var leftLeg   = cylinderZ(points,normals,texs,tags,0.15,-0.08,0.0,0.3,0.07,black);//left leg
+    var rightLeg  = cylinderZ(points,normals,texs,tags,-0.15,-0.08,0.0,0.3,0.07,white);//right leg
+    var leftFoot  = ellipsoid(points,normals,texs,tags,0.15,-0.08,0.3,0.07,0.09,0.07,black);//left foot
+    var rightFoot = ellipsoid(points,normals,texs,tags,-0.15,-0.08,0.3,0.07,0.09,0.07,white);//right foot
+    var leftEar   = sphere(points,normals,texs,tags,0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,black);//left ear
+    var rightEar  = sphere(points,normals,texs,tags,-0.27*Math.cos(Math.PI/3),0.28+0.27*Math.sin(Math.PI/3),0,0.08,white);//right ear
 
     //设置名称映射关系
     obj.get={
@@ -71,11 +68,25 @@ function bear(obj){
     //leftLeg.theta=[-135,0,0];
 }
 
-function  sun(obj){
+function sun(obj){
   tags=obj.tags;
   texs=obj.texs;
   normals=obj.normals;
   points=obj.points;
   sphere(points,normals,texs, tags,0,0,0,0.2,red);
+  obj.colorDirect=red;
+}
+
+function christmasHat(obj){
+    tags=obj.tags;
+    texs=obj.texs;
+    normals=obj.normals;
+    points=obj.points;
+    var bottom=wheelXZ(points,normals,texs,tags,0,0,0,0.2,0.05,white);
+    var body=coneY(points,normals,texs,tags,0,0,0.05,0.4,0.2,red);
+    var ball=sphere(points,normals,texs,tags,0,0.4,0,0.05,white);
+
+    
+    //obj.colorDirect=red;
 }
 
