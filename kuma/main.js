@@ -56,9 +56,7 @@ function Camera() {
     }
 }
 
-var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
-var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
-var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -103,11 +101,11 @@ window.onload = function init() {
     sendData(bear2);
 
     christmasHat(hat1);
-    hat1.offset=[-0.35, 0.7, 0];
+    hat1.offset=[-0.35, 0.72, 0];
     sendData(hat1);
 
     christmasHat(hat2);
-    hat2.offset=[0.35, 0.7, 0];
+    hat2.offset=[0.35, 0.72, 0];
     sendData(hat2);
 
     sun(dotLight);
@@ -172,7 +170,10 @@ function drawObject(obj)
     for(var i=1;i<obj.tags.length;i++){
         tag=obj.tags[i];
         gl.uniform1i(gl.getUniformLocation(program, "bTexCoord"), i);
-        gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(tag.material.diffuse));
+        gl.uniform4fv(gl.getUniformLocation(program,"ambientProduct"),flatten(mult(dotLight.material.ambient,tag.material.ambient)));
+        gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(mult(dotLight.material.diffuse,tag.material.diffuse)));
+        gl.uniform4fv(gl.getUniformLocation(program,"specularProduct"),flatten(mult(dotLight.material.specular,tag.material.specular)));
+        gl.uniform1f(gl.getUniformLocation(program,"shininess"),tag.material.shininess);
         // if(i==5||i==7)
         //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
         // else if(i==6||i==8)
@@ -224,39 +225,11 @@ function render() {
     bear1.rMat = rotates(bear1.rMat, bear1.theta);
     bear1.nextAction();
     prepareData(bear1);
-    
-    materialAmbient = vec4( 0.4, 0.4, 0.4, 1.0 );
-    materialDiffuse = vec4( 88/255,88/255,88/255,1.0);//red
-    materialSpecular = vec4( 0.1, 0.2, 0.0, 1.0 );
-    materialShininess = 20.0;
-
-    ambientProduct = mult(lightAmbient, materialAmbient);
-    diffuseProduct = mult(lightDiffuse, materialDiffuse);
-    specularProduct = mult(lightSpecular, materialSpecular);
-
-    gl.uniform4fv(gl.getUniformLocation(program,"ambientProduct"),flatten(ambientProduct));
-    gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(diffuseProduct));
-    gl.uniform4fv(gl.getUniformLocation(program,"specularProduct"),flatten(specularProduct));
-    gl.uniform1f( gl.getUniformLocation(program,"shininess"),materialShininess );
     drawObject(bear1);
 
     bear2.rMat = rotates(bear2.rMat, bear2.theta);
     bear2.nextAction();
     prepareData(bear2);
-
-    materialAmbient = vec4( 0.4, 0.4, 0.4, 1.0 );
-    materialDiffuse = vec4( 128/255, 64/255, 0.0,1.0);//brown
-    materialSpecular = vec4( 0.1, 0.2, 0.0, 1.0 );
-    materialShininess = 100.0;
-
-    ambientProduct = mult(lightAmbient, materialAmbient);
-    diffuseProduct = mult(lightDiffuse, materialDiffuse);
-    specularProduct = mult(lightSpecular, materialSpecular);
-
-    gl.uniform4fv(gl.getUniformLocation(program,"ambientProduct"),flatten(ambientProduct));
-    gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(diffuseProduct));
-    gl.uniform4fv(gl.getUniformLocation(program,"specularProduct"),flatten(specularProduct));
-    gl.uniform1f( gl.getUniformLocation(program,"shininess"),materialShininess );
     drawObject(bear2);
 
     prepareData(hat1);

@@ -29,25 +29,25 @@ uniform float shininess;
 void
 main()
 {
-  //位置部分
-  gl_Position = projection*modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
-
   //颜色部分
-  vec3 pos=(modelView*cmt_T*vec4(vPosition,1)).xyz;
+  vec4 pos=modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
   if(lightPosition.w==0.0) L=normalize((modelView*lightPosition).xyz);
-  else L=normalize((modelView*lightPosition).xyz-pos);
-  vec3 E=normalize(-pos);
+  else L=normalize((modelView*lightPosition).xyz-pos.xyz);
+  vec3 E=normalize(-pos.xyz);
   vec3 H=normalize(L+E);
   N=normalize((modelView*cmt_R*cmtPart*vec4(normalize(vNormal),0)).xyz);
   ambient=ambientProduct;
-  diffuse=diffuseProduct;
-  
+  float Kd=max(dot(L,N),0.0);
+  diffuse=Kd*diffuseProduct;
   float Ks=pow(max(dot(N,H),0.0),shininess);
   specular=Ks*specularProduct;
   if(dot(L,N)<0.0) specular=vec4(0.0,0.0,0.0,1.0);
   
   s=vTexCoord.x;
   t=vTexCoord.y;
+
+  //位置部分
+  gl_Position = projection*pos;
 }
 </script>
 
@@ -70,8 +70,8 @@ main()
   if(colorDirect.w==1.0) fcolor=colorDirect;
   else{
     float Kd=max(dot(L,N),0.0);
-    if(diffuse.w!=0.0)
-      fcolor=0.4*diffuse+Kd*diffuse+specular;  
+    if(diffuse.w!=0.0||ambient.w!=0.0)
+      fcolor=ambient+diffuse+specular;  
     else if(bTexCoord==1)
       fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
     else if(bTexCoord==2)

@@ -11,14 +11,18 @@ var Color={
 }
 
 var Material={
-    create: function(colorAD){
-        if(arguments.length==0){
-            colorAD=Color.undefine;
-        }
+    create: function(colorA,colorD,colorS,shininess){
+       switch(arguments.length){
+           case 0: colorA=Color.undefine;
+           case 1: colorD=colorA;
+           case 2: colorS=Color.undefine;
+           case 3: shininess=100.0;
+       }
        var material={};
-       material.ambient=colorAD;
-       material.diffuse=colorAD;
-       material.specular=vec4();
+       material.ambient=colorA;
+       material.diffuse=colorD;
+       material.specular=colorS;
+       material.shininess=shininess;
        return material;
     },
     black : function(){return Material.create(Color.black);},
