@@ -33,7 +33,7 @@ main()
   gl_Position = projection*modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
 
   //颜色部分
-  vec3 pos=-(modelView*cmt_T*vec4(vPosition,1)).xyz;
+  vec3 pos=(modelView*cmt_T*vec4(vPosition,1)).xyz;
   if(lightPosition.w==0.0) L=normalize((modelView*lightPosition).xyz);
   else L=normalize((modelView*lightPosition).xyz-pos);
   vec3 E=normalize(-pos);

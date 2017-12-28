@@ -218,7 +218,7 @@ function render() {
     //camera and light
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "modelView"), false, flatten(camera.calModelViewMat()));
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, flatten(camera.calPerspectiveMat()));
-    gl.uniform4fv(gl.getUniformLocation(program,"lightPosition"),flatten(vec4(dotLight.offset,0)));
+    gl.uniform4fv(gl.getUniformLocation(program,"lightPosition"),flatten(vec4(dotLight.offset,1)));
 
     //two bears
     bear1.rMat = rotates(bear1.rMat, bear1.theta);
