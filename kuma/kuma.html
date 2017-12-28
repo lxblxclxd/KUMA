@@ -22,7 +22,7 @@ uniform mat4 cmt_R;
 uniform mat4 cmt_T;
 uniform mat4 cmtPart;//物体部件的运动变换矩阵
 uniform mat4 modelView;
-uniform mat4 projection;
+uniform mat4 projection;//投影矩阵
 uniform vec4 lightPosition;
 uniform float shininess;
 
@@ -33,21 +33,12 @@ main()
   gl_Position = projection*modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
 
   //颜色部分
-  // pos is vertex position in eye coordinates
-  vec3 pos=-(modelView*vec4(vPosition,1)).xyz;
-  // vector from vertex position to light source
-  
-
+  vec3 pos=-(modelView*cmt_T*vec4(vPosition,1)).xyz;
   if(lightPosition.w==0.0) L=normalize((modelView*lightPosition).xyz);
   else L=normalize((modelView*lightPosition).xyz-pos);
-
-  // Because the eye point the is at the orgin
-  // the vector from the vertex position to the eye is
   vec3 E=normalize(-pos);
   vec3 H=normalize(L+E);
-  // Transform vertex normal into eye coordinates
   N=normalize((modelView*cmt_R*cmtPart*vec4(normalize(vNormal),0)).xyz);
-  // Compute terms in the illumination equation
   ambient=ambientProduct;
   diffuse=diffuseProduct;
   
@@ -80,11 +71,11 @@ main()
   else{
     float Kd=max(dot(L,N),0.0);
     if(diffuse.w!=0.0)
-      fcolor=ambient+Kd*diffuse+specular;  
+      fcolor=0.4*diffuse+Kd*diffuse+specular;  
     else if(bTexCoord==1)
-      fcolor=ambient+Kd*texture2D(texture0,vec2(s,t))+specular;
+      fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
     else if(bTexCoord==2)
-      fcolor=ambient+Kd*texture2D(texture1,vec2(s,t))+specular;
+      fcolor=0.4*texture2D(texture1,vec2(s,t))+Kd*texture2D(texture1,vec2(s,t))+specular;
     fcolor.a=1.0;
   }
   gl_FragColor = fcolor;
@@ -94,6 +85,7 @@ main()
   <script type="text/javascript" src="../Common/webgl-utils.js"></script>
   <script type="text/javascript" src="../Common/initShaders.js"></script>
   <script type="text/javascript" src="../Common/MV.js"></script>
+  <script type="text/javascript" src="material.js"></script>  
   <script type="text/javascript" src="primitive.js"></script>
   <script type="text/javascript" src="object.js"></script>
   <script type="text/javascript" src="event.js"></script>

@@ -46,7 +46,10 @@ function addEvents(){
         var keycode = event.keyCode;
         var realkey = String.fromCharCode(event.keyCode);
 
-        if (keycode == 87) move(character, front);//w
+        if (keycode == 87){
+            character.setAction('StandUp');
+            move(character, front);//w
+        } 
         if (keycode == 65) move(character, left);//a
         if (keycode == 83) move(character, back);//s
         if (keycode == 68) move(character, right);//d
@@ -96,4 +99,18 @@ function move(obj,dir){//算出移动后的偏移量
     offset[yAxis] += (mat[yAxis][0] * dir[0] + mat[yAxis][1] * dir[1] + mat[yAxis][2] * dir[2]);
     offset[zAxis] += (mat[zAxis][0] * dir[0] + mat[zAxis][1] * dir[1] + mat[zAxis][2] * dir[2]);
     return offset;
+}
+
+function rotates(mat, theta,center){//原矩阵根据角度和旋转中心左乘旋转矩阵
+    if (arguments.length == 3)
+        mat=  mult(translate(negate(center)), mat);
+    if(theta[xAxis]!=0)
+        mat = mult(rotateX(theta[xAxis]), mat);
+    if(theta[yAxis]!=0)
+        mat = mult(rotateY(theta[yAxis]), mat);
+    if(theta[zAxis]!=0)
+        mat = mult(rotateZ(theta[zAxis]), mat);
+    if (arguments.length == 3)
+        mat=  mult(translate(center), mat);
+    return mat;
 }

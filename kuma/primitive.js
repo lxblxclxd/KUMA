@@ -9,18 +9,18 @@ pink = [255 / 255, 128 / 255, 255 / 255,1.0];
 color_undefined=[0.0,0.0,0.0,0.0];
 
 
-function Component(type,start,numOfPoints,colorRaw) {
+function Component(type,start,numOfPoints,material) {
   if (arguments.length == 0) {
     type=0;
     start=0;
     numOfPoints=0;
-    colorRaw=vec4();
+    material=Material.create();
   } 
   
   this.type=type;
   this.start=start;
   this.numOfPoints=numOfPoints;
-  this.colorRaw=colorRaw;//直接显示的颜色
+  this.material=material;//直接显示的颜色
 
   this.theta=[0,0,0];//离初始位置的偏转角度在三个方向的分量
   this.rootPos=vec3();//物体旋转所绕的点
@@ -58,48 +58,47 @@ function Component(type,start,numOfPoints,colorRaw) {
   }
 }
 
-function sphere(points,normals,texs,tags,x,y,z,radis,color)
+function sphere(points,normals,texs,tags,x,y,z,radis,material)
 {
-  return ellipsoid(points,normals,texs,tags,x,y,z,radis,radis,radis,color);
+  return ellipsoid(points,normals,texs,tags,x,y,z,radis,radis,radis,material);
 }
 
-function cylinderX(points,normals,texs,tags,x,y,z,radis,height,color)//柱面，中心轴平行于x轴
-{
-}
-
-function cylinderY(points,normals,texs,tags,x,y,z,radis,height,color)//柱面，中心轴平行于y轴
+function cylinderX(points,normals,texs,tags,x,y,z,radis,height,material)//柱面，中心轴平行于x轴
 {
 }
 
-function cylinderZ(points,normals,texs,tags,x,y,zback,zfront,radis,color){//柱面，中心轴平行于z轴
-  return circularZ(points,normals,texs,tags,x,y,zback,zfront,radis,radis,color);
+function cylinderY(points,normals,texs,tags,x,y,z,radis,height,material)//柱面，中心轴平行于y轴
+{
 }
 
-function coneY(points,normals,texs,tags,x,z,ybottom,ytop,radis,color){//圆锥面，中心轴平行于y轴
-  var tag=circularZ(points,normals,texs,tags,x,z,ybottom,ytop,radis,0,color);
+function cylinderZ(points,normals,texs,tags,x,y,zback,zfront,radis,material){//柱面，中心轴平行于z轴
+  return circularZ(points,normals,texs,tags,x,y,zback,zfront,radis,radis,material);
+}
+
+function coneY(points,normals,texs,tags,x,z,ybottom,ytop,radis,material){//圆锥面，中心轴平行于y轴
+  var tag=circularZ(points,normals,texs,tags,x,z,ybottom,ytop,radis,0,material);
   tag.theta=[90,0,0];
   return tag;
 }
 
-function coneZ(points,normals,texs,tags,x,y,zback,zfront,radis,color){//圆锥面，中心轴平行于z轴
-  return circularZ(points,normals,texs,tags,x,y,zback,zfront,radis,0,color);
+function coneZ(points,normals,texs,tags,x,y,zback,zfront,radis,material){//圆锥面，中心轴平行于z轴
+  return circularZ(points,normals,texs,tags,x,y,zback,zfront,radis,0,material);
 }
 
-function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,color){//圆台面，中心轴平行于z轴
+function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,material){//圆台面，中心轴平行于z轴
     if(zback>zfront){
       zback = [zfront,zfront=zback][0];//交换zback与zfront的值
       rback = [rfront,rfront=rback][0];
     }
     var theta;
     var theta1=Math.atan((rback-rfront)/2/(zfront-zback));
-    nx=rx*Math.cos(theta1);
-    ny=ry*Math.cos(theta1);
     nz=Math.sin(theta1);
     for(var i=0;i<=360;i++){
       theta=i/360*2*Math.PI;
       rx=Math.cos(theta);
       ry=Math.sin(theta);
-      
+      nx=rx*Math.cos(theta1);
+      ny=ry*Math.cos(theta1);
       points.push(vec3(x+rback*rx,y+rback*ry,zback),vec3(x+rfront*rx,y+rfront*ry,zfront));
       normals.push(vec3(nx,ny,nz),vec3(nx,ny,nz));
       texy=i/360;    
@@ -113,10 +112,10 @@ function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,color)
       vec3(x,y,zfront),vec3(x,y,zback),
       vec3(x,y,z)
      ];
-    return addTag(tags,color,3,2*361,stdPos);
+    return addTag(tags,material,3,2*361,stdPos);
 }
 
-function wheelXZ(points,normals,texs,tags,x,y,z,r1,r2,color){
+function wheelXZ(points,normals,texs,tags,x,y,z,r1,r2,material){
   for(var j=0;j<360;j+=precise){
     theta2=j/360*2*Math.PI;
     for(var i=0;i<=360;i+=precise){
@@ -145,11 +144,11 @@ function wheelXZ(points,normals,texs,tags,x,y,z,r1,r2,color){
     vec3(x,y,z+r1+r2),vec3(x,y,z-r1-r2),
     vec3(x,y,z)
    ];
-   return addTag(tags,color,3,2*360*(360+precise)/precise/precise,stdPos);
+   return addTag(tags,material,3,2*360*(360+precise)/precise/precise,stdPos);
 }
 
 
-function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
+function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,material)//椭球
 {
   var theta1;
   var theta2;
@@ -196,7 +195,7 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
     vec3(x,y,z+c),vec3(x,y,z-c),
     vec3(x,y,z)
    ];
-   return addTag(tags,color,3,180*(360+precise)*2/precise/precise,stdPos);
+   return addTag(tags,material,3,180*(360+precise)*2/precise/precise,stdPos);
 }
 
 // function parabola(p1,p2,p3,n){//X(a,b,c)=y n个点的xy平面抛物线y=ax2+bx+c
@@ -219,11 +218,11 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,color)//椭球
 // }
 
 
-function addTag(tags,color,type,length,stdPos)//增加当前部件的标签
+function addTag(tags,material,type,length,stdPos)//增加当前部件的标签
 {
     tagLast=tags[tags.length-1];
     start=tagLast.start+tagLast.numOfPoints;
-    tagThis=new Component(type,start,length,color);
+    tagThis=new Component(type,start,length,material);
     if(stdPos.length==7){  
       tagThis.upPos    =stdPos[0];
       tagThis.downPos  =stdPos[1];
@@ -237,7 +236,7 @@ function addTag(tags,color,type,length,stdPos)//增加当前部件的标签
     return tagThis;
 }
 
-// function cube(points,  texs,tags, x, y, z, scal, color) {
+// function cube(points,  texs,tags, x, y, z, scal, material) {
 //     A = vec3(-1, -1, 1);
 //     B = vec3(-1, 1, 1);
 //     C = vec3(1, 1, 1);
@@ -261,5 +260,5 @@ function addTag(tags,color,type,length,stdPos)//增加当前部件的标签
 //     for (i = 0; i < v.length; i++) {
 //         points.push(add(scale(scal, v[i]), vec3(x, y, z)));
 //     }
-//     return addTag(tags,color, 1, v.length);
+//     return addTag(tags,material, 1, v.length);
 //   }

@@ -172,7 +172,7 @@ function drawObject(obj)
     for(var i=1;i<obj.tags.length;i++){
         tag=obj.tags[i];
         gl.uniform1i(gl.getUniformLocation(program, "bTexCoord"), i);
-        gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(tag.colorRaw));
+        gl.uniform4fv(gl.getUniformLocation(program,"diffuseProduct"),flatten(tag.material.diffuse));
         // if(i==5||i==7)
         //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
         // else if(i==6||i==8)
@@ -190,7 +190,7 @@ function drawObject(obj)
 }
 
 function drawShadow(obj){
-    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)) );
+    gl.uniform4fv( gl.getUniformLocation(program,"colorDirect"),flatten(vec4(0,0,0,1)));
     m = mat4();m[3][3] = 0;m[3][1] = -1 / dotLight.offset[1];
     mvMatrix = mult(camera.calModelViewMat(), translate(dotLight.offset));
     mvMatrix = mult(mvMatrix, m);
@@ -203,19 +203,6 @@ function drawShadow(obj){
     drawObject(obj);
 }
 
-function rotates(mat, theta,center){//原矩阵根据角度和旋转中心左乘旋转矩阵
-    if (arguments.length == 3)
-        mat=  mult(translate(negate(center)), mat);
-    if(theta[xAxis]!=0)
-        mat = mult(rotateX(theta[xAxis]), mat);
-    if(theta[yAxis]!=0)
-        mat = mult(rotateY(theta[yAxis]), mat);
-    if(theta[zAxis]!=0)
-        mat = mult(rotateZ(theta[zAxis]), mat);
-    if (arguments.length == 3)
-        mat=  mult(translate(center), mat);
-    return mat;
-}
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

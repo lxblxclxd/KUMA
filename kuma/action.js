@@ -32,7 +32,10 @@ function JumpUp(obj){
 }
 
 function StandUp(obj){
-    
+    if(!(obj.get['leftLeg']||obj.get['rightLeg']))
+        return;
+    if(obj.get['leftLeg'].theta[0]!=0)
+        return;
     for(i=90-1;i>=0;i--){
         obj.actionList.push([function(obj,i){
             leftLeg=obj.get['leftLeg'];
@@ -42,7 +45,7 @@ function StandUp(obj){
             leftLeg.theta[0]-=1;
             rightLeg.theta[0]-=1;
             
-            if(legLength*Math.sin(radians(i))>=0.2){//触碰地面
+            if(legLength*Math.sin(radians(i))>=0.12){//触碰地面
                 obj.offset[1]-=legLength*Math.sin(radians(i));
                 obj.offset[2]-=legLength*(1-Math.cos(radians(i)));
                 obj.offset[1]+=legLength*Math.sin(radians((i+1)));
