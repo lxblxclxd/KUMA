@@ -23,7 +23,7 @@ function SceneObject() {
   }   
 }
 
-function bear(obj){
+function bear(obj) {
     tags=obj.tags;
     texs=obj.texs;
     normals=obj.normals;
@@ -71,7 +71,7 @@ function bear(obj){
     //leftLeg.theta=[-135,0,0];
 }
 
-function sun(obj){
+function sun(obj) {
   tags=obj.tags;
   texs=obj.texs;
   normals=obj.normals;
@@ -81,7 +81,7 @@ function sun(obj){
   obj.colorDirect=Color.red;
 }
 
-function christmasHat(obj){
+function christmasHat(obj) {
     tags=obj.tags;
     texs=obj.texs;
     normals=obj.normals;
@@ -89,5 +89,33 @@ function christmasHat(obj){
     var bottom=wheelXZ(points,normals,texs,tags,0,0,0,0.2,0.05,Material.white());//帽檐
     var body=coneY(points,normals,texs,tags,0,0,0.05,0.4,0.2,Material.red());//帽身
     var ball=sphere(points,normals,texs,tags,0,0.4,0,0.05,Material.white());//小球
+}
+
+function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为SceneObject对象
+    tags=obj.tags;
+    texs=obj.texs;
+    normals=obj.normals;
+    points=obj.points;
+    texsRaw=objRaw.texs;
+    normalsRaw=objRaw.normals;
+    pointsRaw=objRaw.points;
+    indicesRaw=objRaw.indices;
+    obj.name=objRaw.name;
+
+    for(j = 0,len=pointsRaw.length/3; j < len; j++) {
+        points.push(pointsRaw.splice(0,3));
+    }
+
+    for(j = 0,len=texsRaw.length/2; j < len; j++) {
+        texs.push(texsRaw.splice(0,2));
+    }
+
+    for(j = 0,len=normalsRaw.length/3; j < len; j++) {
+        normals.push(normalsRaw.splice(0,3));
+    }
+
+    obj.indices=indicesRaw;
+    addTag(tags,Material.red(),0,indicesRaw.length/3,[0]);
+    obj.colorDirect=Color.red;
 }
 

@@ -100,7 +100,8 @@ window.onload = function init() {
   sendData(bear1);
 
   //variable 2
-  bear(bear2);
+  //bear(bear2);
+  readObj(bear2,comaru);
   bear2.offset = [0.35, 0.2, 0];
   sendData(bear2);
 
@@ -150,6 +151,12 @@ function sendData(obj) {
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.texs), gl.STATIC_DRAW);
   }
+
+  if (obj.indices) {
+    obj.iBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.iBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices), gl.STATIC_DRAW);
+  }
 }
 
 function prepareData(obj) {
@@ -190,7 +197,7 @@ function prepareData(obj) {
     flatten(translate(obj.offset))
   );
 
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < 8; i++) {//设置贴图（不多于八张）
     image = document.getElementById(obj.name + i);
     if (image) configureTexture(image, i);
     else break;
@@ -232,11 +239,10 @@ function drawObject(obj) {
       false,
       flatten(tag.calCMT())
     );
-    if (tag.type == 1) gl.drawArrays(gl.TRIANGLES, tag.start, tag.numOfPoints);
-    if (tag.type == 2)
-      gl.drawArrays(gl.TRIANGLE_FAN, tag.start, tag.numOfPoints);
-    if (tag.type == 3)
-      gl.drawArrays(gl.TRIANGLE_STRIP, tag.start, tag.numOfPoints);
+    if (tag.type == 0) gl.drawElements(gl.TRIANGLES, tag.numOfPoints*3, gl.UNSIGNED_SHORT, tag.start );
+    else if (tag.type == 1) gl.drawArrays(gl.TRIANGLES, tag.start, tag.numOfPoints);
+    else if (tag.type == 2) gl.drawArrays(gl.TRIANGLE_FAN, tag.start, tag.numOfPoints);
+    else if (tag.type == 3) gl.drawArrays(gl.TRIANGLE_STRIP, tag.start, tag.numOfPoints);
   }
 }
 
