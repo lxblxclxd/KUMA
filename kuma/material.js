@@ -28,5 +28,9 @@ var Material={
     black : function(){return Material.create(Color.black);},
     white : function(){return Material.create(Color.white);},
     red : function(){return Material.create(Color.red);},
-    undefine : function(){return Material.create();}
+    undefine : function(i){
+        var mt=Material.create();
+        mt.image=i;
+        return mt;
+    }
 }

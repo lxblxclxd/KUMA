@@ -12,6 +12,7 @@ function SceneObject() {
   this.nBuffer=null;
   this.tBuffer=null;
 
+  this.images=[];
   this.get=null;
   this.actionList=[];
   this.setAction=function(action){//设置执行一个动作
@@ -27,10 +28,12 @@ function bear(obj){
     texs=obj.texs;
     normals=obj.normals;
     points=obj.points;
+    obj.name="bear";
+
     //计算points，normals和texs并设置颜色
     //左右区分按照熊自身的位置，如左手在我们默认视角的右侧
-    var head      = sphere(points,normals,texs,tags,0,0.3,0,0.2,Material.undefine());//face
-    var body      = ellipsoid(points,normals,texs,tags,0,0,0,0.27,0.2,0.2,Material.undefine());//body
+    var head      = sphere(points,normals,texs,tags,0,0.3,0,0.2,Material.undefine(0));//face
+    var body      = ellipsoid(points,normals,texs,tags,0,0,0,0.27,0.2,0.2,Material.undefine(1));//body
     var leftHand  = ellipsoid(points,normals,texs,tags,0.27,0,0,0.05,0.08,0.05,Material.black());//left hand
     var rightHand = ellipsoid(points,normals,texs,tags,-0.27,0,0,0.05,0.08,0.05,Material.white());//right hand
     var leftLeg   = cylinderZ(points,normals,texs,tags,0.15,-0.08,0.0,0.3,0.07,Material.black());//left leg
