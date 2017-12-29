@@ -14,6 +14,7 @@ varying float s,t;
 varying vec4 ambient;
 varying vec4 diffuse;
 varying vec4 specular;
+varying float Kd;
 varying vec3 L;
 varying vec3 N;
 
@@ -37,7 +38,7 @@ main()
   vec3 H=normalize(L+E);
   N=normalize((modelView*cmt_R*cmtPart*vec4(normalize(vNormal),0)).xyz);
   ambient=ambientProduct;
-  float Kd=max(dot(L,N),0.0);
+  Kd=max(dot(L,N),0.0);
   diffuse=Kd*diffuseProduct;
   float Ks=pow(max(dot(N,H),0.0),shininess);
   specular=Ks*specularProduct;
@@ -47,7 +48,8 @@ main()
   t=vTexCoord.y;
 
   //位置部分
-  gl_Position = projection*pos;
+  //gl_Position = projection*pos;
+  gl_Position=projection*modelView*vec4(vPosition,1);
 }
 </script>
 
@@ -58,27 +60,27 @@ varying vec4 ambient;
 varying vec4 diffuse;
 varying vec4 specular;
 uniform vec4 colorDirect;
-varying vec3 L,N;
 varying float s,t;
+varying float Kd;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 uniform int bTexCoord;
 void
 main()
-{
-  vec4 fcolor;
-  if(colorDirect.w==1.0) fcolor=colorDirect;
-  else{
-    float Kd=max(dot(L,N),0.0);
-    if(diffuse.w!=0.0||ambient.w!=0.0)
-      fcolor=ambient+diffuse+specular;  
-    else if(bTexCoord==1)
-      fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
-    else if(bTexCoord==2)
-      fcolor=0.4*texture2D(texture1,vec2(s,t))+Kd*texture2D(texture1,vec2(s,t))+specular;
-    fcolor.a=1.0;
-  }
-  gl_FragColor = fcolor;
+{ 
+  gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+  //vec4 fcolor;
+  //if(colorDirect.w==1.0) fcolor=colorDirect;
+  //else{
+  //  if(diffuse.w!=0.0||ambient.w!=0.0)
+  //    fcolor=ambient+diffuse+specular;  
+  //  else if(bTexCoord==1)
+  //    fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
+  //  else if(bTexCoord==2)
+  //    fcolor=0.4*texture2D(texture1,vec2(s,t))+Kd*texture2D(texture1,vec2(s,t))+specular;
+  //  fcolor.a=1.0;
+  //}
+  //gl_FragColor = fcolor;
 }
 </script>
 
@@ -87,6 +89,7 @@ main()
   <script type="text/javascript" src="../Common/MV.js"></script>
   <script type="text/javascript" src="material.js"></script>  
   <script type="text/javascript" src="primitive.js"></script>
+  <script type="text/javascript" src="comaru.js"></script>
   <script type="text/javascript" src="object.js"></script>
   <script type="text/javascript" src="event.js"></script>
   <script type="text/javascript" src="action.js"></script>

@@ -57,7 +57,6 @@ function Camera() {
 }
 
 
-
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
     camera.aspect = canvas.width / canvas.height;
@@ -91,35 +90,49 @@ window.onload = function init() {
     // Create a buffer object, initialize it, and associate it with the
     //  associated attribute variable in our vertex shader
     //variable 1
-    bear(bear1);
-    bear1.offset=[-0.35, 0.2, 0];
-    sendData(bear1);
+    // bear(bear1);
+    // bear1.offset=[-0.35, 0.2, 0];
+    // sendData(bear1);
 
-    //variable 2
-    bear(bear2);
-    bear2.offset=[0.35, 0.2, 0];
-    sendData(bear2);
+    // //variable 2
+    // bear(bear2);
+    // bear2.offset=[0.35, 0.2, 0];
+    // sendData(bear2);
 
-    christmasHat(hat1);
-    hat1.offset=[-0.35, 0.72, 0];
-    sendData(hat1);
+    // christmasHat(hat1);
+    // hat1.offset=[-0.35, 0.72, 0];
+    // sendData(hat1);
 
-    christmasHat(hat2);
-    hat2.offset=[0.35, 0.72, 0];
-    sendData(hat2);
+    // christmasHat(hat2);
+    // hat2.offset=[0.35, 0.72, 0];
+    // sendData(hat2);
 
-    sun(dotLight);
-    dotLight.offset=[0.0, 1.0, 3.0];
-    sendData(dotLight);
+    // sun(dotLight);
+    // dotLight.offset=[0.0, 1.0, 3.0];
+    //sendData(dotLight);
 
-    camera.attach(bear1);
-    image0 = document.getElementById("texImage3");
-    configureTexture( image0,0 );
-    image1 = document.getElementById("texImage5");
-    configureTexture( image1,1 );
+    // camera.attach(bear1);
+    // image0 = document.getElementById("texImage3");
+    // configureTexture( image0,0 );
+    // image1 = document.getElementById("texImage5");
+    // configureTexture( image1,1 );
 
     addEvents();
-    
+
+var iBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+// vertex array attribute buffer
+var vBuffer = gl.createBuffer();
+gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW );
+
+var vPosition = gl.getAttribLocation( program, "vPosition" );
+gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
+gl.enableVertexAttribArray( vPosition );
+
+
     render();
 };
 
@@ -222,30 +235,31 @@ function render() {
     gl.uniform4fv(gl.getUniformLocation(program,"lightPosition"),flatten(vec4(dotLight.offset,1)));
 
     //two bears
-    bear1.rMat = rotates(bear1.rMat, bear1.theta);
-    bear1.nextAction();
-    prepareData(bear1);
-    drawObject(bear1);
+//     bear1.rMat = rotates(bear1.rMat, bear1.theta);
+//     bear1.nextAction();
+//     prepareData(bear1);
+//     drawObject(bear1);
 
-    bear2.rMat = rotates(bear2.rMat, bear2.theta);
-    bear2.nextAction();
-    prepareData(bear2);
-    drawObject(bear2);
+//     bear2.rMat = rotates(bear2.rMat, bear2.theta);
+//     bear2.nextAction();
+//     prepareData(bear2);
+//     drawObject(bear2);
 
-    prepareData(hat1);
-    drawObject(hat1);
+//     prepareData(hat1);
+//     drawObject(hat1);
 
-    prepareData(hat2);
-    drawObject(hat2);
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //lightdot
-    prepareData(dotLight);
-    drawObject(dotLight);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //shadow
-    drawShadow(bear1);
-    drawShadow(bear2);
-
+//     prepareData(hat2);
+//     drawObject(hat2);
+// ////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    //lightdot
+//    prepareData(dotLight);
+//    drawObject(dotLight);
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+//     //shadow
+//     drawShadow(bear1);
+//     drawShadow(bear2);
+    
+    gl.drawElements( gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0 );
     window.requestAnimFrame(render);
 
 }
