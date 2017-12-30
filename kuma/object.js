@@ -69,6 +69,7 @@ function bear(obj) {
     rightLeg.attach(rightFoot,rightFoot.backPos);
 
     //leftLeg.theta=[-135,0,0];
+    obj.imgReverse=true;
 }
 
 function sun(obj) {
@@ -100,6 +101,7 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     normalsRaw=objRaw.normals;
     pointsRaw=objRaw.points;
     indicesRaw=objRaw.indices;
+    tagsRaw=objRaw.tags;
     obj.name=objRaw.name;
 
     for(j = 0,len=pointsRaw.length/3; j < len; j++) {
@@ -113,9 +115,14 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     for(j = 0,len=normalsRaw.length/3; j < len; j++) {
         normals.push(normalsRaw.splice(0,3));
     }
-
+    im=[1,0,1,1,1,1,1,4,1,0,0,3,0,0,0,0,0,0,7,0,0,0,0,0,0,4,3,3,3,2];
     obj.indices=indicesRaw;
-    addTag(tags,Material.red(),0,indicesRaw.length/3,[0]);
-    obj.colorDirect=Color.red;
+    for(j = 0;j < tagsRaw.length-1;j++){
+        i=im[j];
+        len=tagsRaw[j+1]-tagsRaw[j];       
+        addTag(tags,Material.undefine(i),0,len,[0]);
+    }
+    //addTag(tags,Material.red(),0,indicesRaw.length/3,[0]);
+    obj.imgReverse=false;
 }
 

@@ -64,6 +64,12 @@ varying float s,t;
 varying float Kd;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
+uniform sampler2D texture2;
+uniform sampler2D texture3;
+uniform sampler2D texture4;
+uniform sampler2D texture5;
+uniform sampler2D texture6;
+uniform sampler2D texture7;
 uniform int bTexCoord;
 void
 main()
@@ -78,6 +84,18 @@ main()
       fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
     else if(bTexCoord==1)
       fcolor=0.4*texture2D(texture1,vec2(s,t))+Kd*texture2D(texture1,vec2(s,t))+specular;
+    else if(bTexCoord==2)
+      fcolor=0.4*texture2D(texture2,vec2(s,t))+Kd*texture2D(texture2,vec2(s,t))+specular;
+    else if(bTexCoord==3)
+      fcolor=0.4*texture2D(texture3,vec2(s,t))+Kd*texture2D(texture3,vec2(s,t))+specular;
+    else if(bTexCoord==4)
+      fcolor=0.4*texture2D(texture4,vec2(s,t))+Kd*texture2D(texture4,vec2(s,t))+specular;
+    else if(bTexCoord==5)
+      fcolor=0.4*texture2D(texture5,vec2(s,t))+Kd*texture2D(texture5,vec2(s,t))+specular;
+    else if(bTexCoord==6)
+      fcolor=0.4*texture2D(texture6,vec2(s,t))+Kd*texture2D(texture6,vec2(s,t))+specular;
+    else if(bTexCoord==7)
+      fcolor=0.4*texture2D(texture7,vec2(s,t))+Kd*texture2D(texture7,vec2(s,t))+specular;
     fcolor.a=1.0;
   }
   gl_FragColor = fcolor;
@@ -149,6 +167,14 @@ main()
   <div>  
   <img id = "bear0" src = "1.bmp" hidden></img>
   <img id = "bear1" src = "3.bmp" hidden></img>
+  <img id = "comaru0" src="../img/hada.png" hidden></img>
+  <img id = "comaru1" src="../img/huku.png" hidden></img>
+  <img id = "comaru2" src="../img/huku2.png" hidden></img>
+  <img id = "comaru3" src="../img/kami.png" hidden></img>
+  <img id = "comaru4" src="../img/rfb.png" hidden></img>
+  <img id = "comaru5" src="../img/toon-se-ra-.bmp" hidden></img>
+  <img id = "comaru6" src="../img/toon-skin.bmp" hidden></img>
+  <img id = "comaru7" src="../img/touka.png" hidden></img>
 </div>
 </body>
 

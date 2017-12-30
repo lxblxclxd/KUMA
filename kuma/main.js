@@ -28,6 +28,8 @@ var character = bear1;
 // var jumpHeight=0;
 // var directionj=0.5;
 
+var textures=[];
+
 var dr = radians(5.0);
 function Camera() {
   this.near = 0.3;
@@ -121,6 +123,9 @@ window.onload = function init() {
 
   addEvents();
 
+  for(var i=0;i<8;i++) {
+    textures.push(gl.createTexture());
+  }
   // var iBuffer = gl.createBuffer();
   // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
   // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(comaru.indices), gl.STATIC_DRAW);
@@ -156,6 +161,15 @@ function sendData(obj) {
     obj.iBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.iBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices), gl.STATIC_DRAW);
+    obj.indices=null;
+  }
+  obj.points=null;
+  obj.normals=null;
+  obj.texs=null;
+  for (var i = 0; i < 8; i++) {//设置贴图（不多于八张）
+    image = document.getElementById(obj.name + i);
+    if (!image) break;
+    obj.images.push(image);
   }
 }
 
@@ -197,11 +211,8 @@ function prepareData(obj) {
     flatten(translate(obj.offset))
   );
 
-  for (var i = 0; i < 8; i++) {//设置贴图（不多于八张）
-    image = document.getElementById(obj.name + i);
-    if (image) configureTexture(image, i);
-    else break;
-    obj.images.push(image);
+  for (var i = 0; i < obj.images.length; i++) {//设置贴图（不多于八张）
+    configureTexture(obj.images[i], i, obj.imgReverse);
   }
 }
 
@@ -239,7 +250,7 @@ function drawObject(obj) {
       false,
       flatten(tag.calCMT())
     );
-    if (tag.type == 0) gl.drawElements(gl.TRIANGLES, tag.numOfPoints*3, gl.UNSIGNED_SHORT, tag.start );
+    if (tag.type == 0) gl.drawElements(gl.TRIANGLES, tag.numOfPoints*3, gl.UNSIGNED_SHORT, tag.start*3*2 );//起始位置以字节为单位！
     else if (tag.type == 1) gl.drawArrays(gl.TRIANGLES, tag.start, tag.numOfPoints);
     else if (tag.type == 2) gl.drawArrays(gl.TRIANGLE_FAN, tag.start, tag.numOfPoints);
     else if (tag.type == 3) gl.drawArrays(gl.TRIANGLE_STRIP, tag.start, tag.numOfPoints);
@@ -329,16 +340,15 @@ function render() {
   drawShadow(bear1);
   drawShadow(bear2);
 
-  //    gl.drawElements( gl.TRIANGLES, comaru.indices.length, gl.UNSIGNED_SHORT, 0 );
-  window.requestAnimFrame(render);
+  window.requestAnimFrame(render); 
 }
 
-function configureTexture(image, i) {
+function configureTexture(image, i, reverse) {
   if (i < 0 || i >= 8) return;
-  texture = gl.createTexture();
+  texture = textures[i];
   gl.activeTexture(gl.TEXTURE0 + i);
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, reverse);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
   gl.generateMipmap(gl.TEXTURE_2D);
   gl.texParameteri(
