@@ -43,7 +43,7 @@ main()
   float Ks=pow(max(dot(N,H),0.0),shininess);
   specular=Ks*specularProduct;
   if(dot(L,N)<0.0) specular=vec4(0.0,0.0,0.0,1.0);
-  
+
   s=vTexCoord.x;
   t=vTexCoord.y;
 
@@ -73,13 +73,13 @@ uniform sampler2D texture7;
 uniform int bTexCoord;
 void
 main()
-{ 
+{
   //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
   vec4 fcolor;
   if(colorDirect.w==1.0) fcolor=colorDirect;
   else{
     if(diffuse.w!=0.0||ambient.w!=0.0)
-      fcolor=ambient+diffuse+specular;  
+      fcolor=ambient+diffuse+specular;
     else if(bTexCoord==0)
       fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
     else if(bTexCoord==1)
@@ -105,7 +105,7 @@ main()
   <script type="text/javascript" src="../Common/webgl-utils.js"></script>
   <script type="text/javascript" src="../Common/initShaders.js"></script>
   <script type="text/javascript" src="../Common/MV.js"></script>
-  <script type="text/javascript" src="material.js"></script>  
+  <script type="text/javascript" src="material.js"></script>
   <script type="text/javascript" src="primitive.js"></script>
   <script type="text/javascript" src="comaru.js"></script>
   <script type="text/javascript" src="object.js"></script>
@@ -166,7 +166,7 @@ main()
       <button id="LightReset">Reset</button>
     </p>
   </div>
-  <div>  
+  <div>
   <img id = "bear0" src = "1.bmp" hidden></img>
   <img id = "bear1" src = "3.bmp" hidden></img>
   <img id = "comaru0" src="../img/hada.png" hidden></img>
@@ -177,6 +177,8 @@ main()
   <img id = "comaru5" src="../img/toon-se-ra-.bmp" hidden></img>
   <img id = "comaru6" src="../img/toon-skin.bmp" hidden></img>
   <img id = "comaru7" src="../img/touka.png" hidden></img>
+  <img id = "background0" src = "../img/sky3.png" hidden></img>
+  <img id = "background1" src = "../img/ground.png" hidden></img>
 </div>
 </body>
 

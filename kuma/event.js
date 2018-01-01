@@ -33,13 +33,13 @@ function addEvents(){
     document.getElementById("LightButtonz1").onclick = function () { dotLight.offset[2] += 1.0;  showPosition();};
     document.getElementById("LightButtonz2").onclick = function () { dotLight.offset[2] -= 1.0;  showPosition();};
     document.getElementById("LightReset").onclick = function () { dotLight.offset=[0,1,3];  showPosition();};
- 
+
     showPosition();
-    
+
     function showPosition() {
-        document.getElementById("light-position").innerHTML = dotLight.offset[0]+", "+dotLight.offset[1]+", "+dotLight.offset[2];     
+        document.getElementById("light-position").innerHTML = dotLight.offset[0]+", "+dotLight.offset[1]+", "+dotLight.offset[2];
     }
-    
+
     //listener for keyboard
 
     document.onkeydown = function () {
@@ -49,31 +49,31 @@ function addEvents(){
         if (keycode == 87){
             character.setAction('StandUp');
             move(character, front);//w
-        } 
+        }
         if (keycode == 65) move(character, left);//a
         if (keycode == 83) move(character, back);//s
         if (keycode == 68) move(character, right);//d
 
         if(realkey=='1'){
-            character=bear1; 
-        } 
+            character=bear1;
+        }
         if(realkey=='2'){
             character=bear2;
         }
 
         if (keycode == 32) character.setAction('JumpUp');//space
-        
+
         camera.attach(character);
     }
 
     //鼠标监听控制视角(Camera)
-    mouseX = event.clientX;  
-    mouseY = event.clientY;  
+    mouseX = event.clientX;
+    mouseY = event.clientY;
     document.onmousemove = function(){
         var ctrlKey = event.ctrlKey || event.metaKey;
         mouseXLast=mouseX;
         mouseYLast=mouseY;
-        mouseX = event.clientX;  
+        mouseX = event.clientX;
         mouseY = event.clientY;
         // if(ctrlKey&&mouseX<mouseXLast) theta -=dr;
         // if(ctrlKey&&) theta += dr;

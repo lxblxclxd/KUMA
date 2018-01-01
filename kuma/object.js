@@ -3,7 +3,7 @@ function SceneObject() {
   this.colors = [];
   this.normals=[];//法向量normal vectors
   this.texs=[];
-  this.tags = [new Component()];//(type,start,numOfPoints,colorRaw(vec4)) 
+  this.tags = [new Component()];//(type,start,numOfPoints,colorRaw(vec4))
                                  //type 1 for Triangles,type 3 for Triangle_Strip;
   this.offset = [0, 0, 0];//position of current object
   this.theta = [0, 0, 0];//direction and speed the object rotates
@@ -17,10 +17,10 @@ function SceneObject() {
   this.actionList=[];
   this.setAction=function(action){//设置执行一个动作
       setAction(this,action);
-  }   
+  }
   this.nextAction=function(){//得出执行动作后的下一步状态
       nextAction(this);
-  }   
+  }
 }
 
 function bear(obj) {
@@ -119,7 +119,7 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     obj.indices=indicesRaw;
     for(j = 0;j < tagsRaw.length-1;j++){
         i=im[j];
-        len=tagsRaw[j+1]-tagsRaw[j];       
+        len=tagsRaw[j+1]-tagsRaw[j];
         addTag(tags,Material.undefine(i),0,len,[0]);
     }
     //addTag(tags,Material.red(),0,indicesRaw.length/3,[0]);
@@ -131,7 +131,8 @@ function background(obj){
     texs=obj.texs;
     normals=obj.normals;
     points=obj.points;
-    var sky=medisphere(points,normals,texs,tags,0,0,0,10,10,10,Material.blue());
-    var ground=square(points,normals,texs,tags,0,0,0,40,Material.green());
+    obj.name="background";
+    var sky=medisphere(points,normals,texs,tags,0,0,0,10,10,10,Material.undefine(0));
+    var ground=square(points,normals,texs,tags,0,0,0,40,Material.undefine(1));
+    obj.imgReverse=true;
   }
-  
