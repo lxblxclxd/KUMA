@@ -30,20 +30,59 @@ function Component(type,start,numOfPoints,material) {
     son.rootPos=pos;
     this.sons.push(son);
   }
-  this.calRMat=function(){
+  this.calRMat = function() {
     if(this.father==null)
       return rotates(mat4(),this.theta);
     else
       return rotates(father.calRMat(),this.theta);
   }
-  this.calCMT=function(){
-    if(this.father==null)
+  this.calCMT = function() {
+    if(this.father == null)
       return rotates(mat4(),this.theta,this.rootPos);
     else
       return rotates(this.father.calCMT(),this.theta,this.rootPos);
   }
-  this.lengthz=function(){
+  this.lengthz = function() {
     return this.frontPos[2]-this.backPos[2];
+  }
+  this.render = function() {
+    gl.uniform1i(
+      gl.getUniformLocation(program, "bTexCoord"),
+      this.material.image
+    );
+    gl.uniform4fv(
+      gl.getUniformLocation(program, "ambientProduct"),
+      flatten(mult(dotLight.material.ambient, this.material.ambient))
+    );
+    gl.uniform4fv(
+      gl.getUniformLocation(program, "diffuseProduct"),
+      flatten(mult(dotLight.material.diffuse, this.material.diffuse))
+    );
+    gl.uniform4fv(
+      gl.getUniformLocation(program, "specularProduct"),
+      flatten(mult(dotLight.material.specular, this.material.specular))
+    );
+    gl.uniform1f(
+      gl.getUniformLocation(program, "shininess"),
+      this.material.shininess
+    );
+    // if(i==5||i==7)
+    //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
+    // else if(i==6||i==8)
+    //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(-0.15,-0.08,0),mult(rotateX(-thetaTest-180),translate(0.15,0.08,0)) )));
+    // else
+    //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mat4()));
+    gl.uniformMatrix4fv(
+      gl.getUniformLocation(program, "cmtPart"),
+      false,flatten(this.calCMT())
+    );
+    if (this.type == 0) gl.drawElements(gl.TRIANGLES, this.numOfPoints*3, gl.UNSIGNED_SHORT, this.start*3*2 );//起始位置以字节为单位！
+    else if (this.type == 1) gl.drawArrays(gl.TRIANGLES, this.start, this.numOfPoints);
+    else if (this.type == 2) gl.drawArrays(gl.TRIANGLE_FAN, this.start, this.numOfPoints);
+    else if (this.type == 3) gl.drawArrays(gl.TRIANGLE_STRIP, this.start, this.numOfPoints);
+  }
+  this.traversal = function(func) {
+
   }
 }
 

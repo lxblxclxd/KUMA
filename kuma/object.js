@@ -12,7 +12,6 @@ function SceneObject() {
   this.nBuffer=null;
   this.tBuffer=null;
 
-  this.images=[];
   this.get=null;
   this.actionList=[];
   this.setAction=function(action){//设置执行一个动作
@@ -20,7 +19,24 @@ function SceneObject() {
   }   
   this.nextAction=function(){//得出执行动作后的下一步状态
       nextAction(this);
+  }
+  this.render = function(){
+      prepareData(this);
+      drawObject(this);
+  }
+  this.drawShadow = function(){
+      drawShadow(this);
   }   
+//   this.copy = function(){
+//       var obj = new SceneObject();
+//       obj.vBuffer = this.vBuffer;
+//       obj.nBuffer = this.nBuffer;
+//       obj.tBuffer = this.tBuffer;
+//       obj.tags = this.tags;
+//       obj.get = this.get;
+//       obj.name = this.name;
+//       return obj;
+//   }
 }
 
 function bear(obj) {
@@ -135,3 +151,113 @@ function background(obj){
     var ground=square(points,normals,texs,tags,0,0,0,40,Material.green());
   }
   
+
+  function sendData(obj) {
+    obj.vBuffer = gl.createBuffer(); //创建缓存区
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer); //绑定缓存区
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.points), gl.STATIC_DRAW); //向缓存区传输数据
+  
+    if (!obj.colorDirect) {
+      obj.nBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normals), gl.STATIC_DRAW);
+  
+      obj.tBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.texs), gl.STATIC_DRAW);
+    }
+  
+    if (obj.indices) {
+      obj.iBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.iBuffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices), gl.STATIC_DRAW);
+      obj.indices=null;
+    }
+    obj.points = null;
+    obj.normals = null;
+    obj.texs = null;
+    obj.imgOffset = images.length;
+    for (var i = 1; i < obj.tags.length; i++) {
+        obj.tags[i].material.image += images.length;
+    }
+    for (var i = 0; images.length<=32 ; i++) {//设置贴图（不多于八张）
+      image = document.getElementById(obj.name + i);
+      if (!image) break;
+      configureTexture(image, images.length, obj.imgReverse);
+      images.push(image);
+    }
+  }
+  
+  function prepareData(obj) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer); //绑定对应缓存区
+    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0); //从该缓存区中取数
+    gl.enableVertexAttribArray(vPosition); //开启取数
+  
+    if (!obj.colorDirect) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
+      gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(vNormal);
+  
+      gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
+      gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(vTexCoord);
+  
+      gl.uniform4fv(
+        gl.getUniformLocation(program, "colorDirect"),
+        flatten(vec4(0, 0, 0, 0))
+      );
+    } else {
+      gl.uniform4fv(
+        gl.getUniformLocation(program, "colorDirect"),
+        flatten(obj.colorDirect)
+      );
+      gl.disableVertexAttribArray(vNormal);
+      gl.disableVertexAttribArray(vTexCoord);
+    }
+  
+    gl.uniformMatrix4fv(
+      gl.getUniformLocation(program, "cmt_R"),
+      false,
+      flatten(obj.rMat)
+    );
+    gl.uniformMatrix4fv(
+      gl.getUniformLocation(program, "cmt_T"),
+      false,
+      flatten(translate(obj.offset))
+    );
+  }
+  
+function drawObject(obj) {
+    for (var i = 1; i < obj.tags.length; i++) {
+      obj.tags[i].render();
+    }
+  }
+  
+  function drawShadow(obj) {
+    gl.uniform4fv(
+      gl.getUniformLocation(program, "colorDirect"),
+      flatten(vec4(0, 0, 0, 1))
+    );
+    m = mat4();
+    m[3][3] = 0;
+    m[3][1] = -1 / dotLight.offset[1];
+    mvMatrix = mult(camera.calModelViewMat(), translate(dotLight.offset));
+    mvMatrix = mult(mvMatrix, m);
+    mvMatrix = mult(mvMatrix, translate(negate(dotLight.offset)));
+    gl.uniformMatrix4fv(
+      gl.getUniformLocation(program, "modelView"),
+      false,
+      flatten(mvMatrix)
+    );
+    gl.uniformMatrix4fv(
+      gl.getUniformLocation(program, "cmt_R"),
+      false,flatten(obj.rMat)
+    );
+    gl.uniformMatrix4fv(
+      gl.getUniformLocation(program, "cmt_T"),
+      false,flatten(translate(obj.offset))
+    );
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer);
+    gl.vertexAttribPointer(bear1.vPosition, 3, gl.FLOAT, false, 0, 0);
+    drawObject(obj);
+  }
