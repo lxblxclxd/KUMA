@@ -1,14 +1,3 @@
-black = [0.0, 0.0, 0.0,1.0];
-gray = [88 / 255, 88 / 255, 88 / 255,1.0];
-white = [1.0, 1.0, 1.0,1.0];
-red = [1.0, 0.0, 0.0,1.0];
-blue = [0.0, 0.0, 1.0,1.0];
-brown = [128 / 255, 64 / 255, 0.0,1.0];
-skin = [247 / 255, 204 / 255, 179 / 255,1.0];
-pink = [255 / 255, 128 / 255, 255 / 255,1.0];
-color_undefined=[0.0,0.0,0.0,0.0];
-
-
 function Component(type,start,numOfPoints,material) {
   if (arguments.length == 0) {
     type=0;
