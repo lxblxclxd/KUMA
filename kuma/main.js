@@ -68,6 +68,8 @@ function Camera() {
 
 window.onload = function init() {
   canvas = document.getElementById("gl-canvas");
+  canvas.setAttribute('width', window.innerWidth);
+  canvas.setAttribute('height', window.innerHeight-5);
   camera.aspect = canvas.width / canvas.height;
 
   gl = WebGLUtils.setupWebGL(canvas);
