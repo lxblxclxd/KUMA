@@ -29,6 +29,7 @@ var character = bear1;
 // var directionj=0.5;
 
 var textures=[];
+var images=[];
 
 var dr = radians(5.0);
 function Camera() {
@@ -94,6 +95,10 @@ window.onload = function init() {
   vNormal = gl.getAttribLocation(program, "vNormal");
   vTexCoord = gl.getAttribLocation(program, "vTexCoord");
 
+  for(var i=0;i<32;i++) {
+    textures.push(gl.createTexture());
+  }
+
   // Create a buffer object, initialize it, and associate it with the
   //  associated attribute variable in our vertex shader
   //variable 1
@@ -123,9 +128,7 @@ window.onload = function init() {
 
   addEvents();
 
-  for(var i=0;i<8;i++) {
-    textures.push(gl.createTexture());
-  }
+  
   // var iBuffer = gl.createBuffer();
   // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
   // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(comaru.indices), gl.STATIC_DRAW);
@@ -163,13 +166,15 @@ function sendData(obj) {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices), gl.STATIC_DRAW);
     obj.indices=null;
   }
-  obj.points=null;
-  obj.normals=null;
-  obj.texs=null;
-  for (var i = 0; i < 8; i++) {//设置贴图（不多于八张）
+  obj.points = null;
+  obj.normals = null;
+  obj.texs = null;
+  obj.imgOffset = images.length;
+  for (var i = 0; images.length<=32 ; i++) {//设置贴图（不多于八张）
     image = document.getElementById(obj.name + i);
     if (!image) break;
-    obj.images.push(image);
+    configureTexture(image, images.length, obj.imgReverse);
+    images.push(image);
   }
 }
 
@@ -210,10 +215,6 @@ function prepareData(obj) {
     false,
     flatten(translate(obj.offset))
   );
-
-  for (var i = 0; i < obj.images.length; i++) {//设置贴图（不多于八张）
-    configureTexture(obj.images[i], i, obj.imgReverse);
-  }
 }
 
 function drawObject(obj) {
@@ -221,7 +222,7 @@ function drawObject(obj) {
     tag = obj.tags[i];
     gl.uniform1i(
       gl.getUniformLocation(program, "bTexCoord"),
-      tag.material.image
+      tag.material.image + obj.imgOffset
     );
     gl.uniform4fv(
       gl.getUniformLocation(program, "ambientProduct"),
@@ -329,8 +330,8 @@ function render() {
   prepareData(hat1);
   drawObject(hat1);
 
-  prepareData(hat2);
-  drawObject(hat2);
+  // prepareData(hat2);
+  // drawObject(hat2);
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   //lightdot
   prepareData(dotLight);
@@ -344,7 +345,7 @@ function render() {
 }
 
 function configureTexture(image, i, reverse) {
-  if (i < 0 || i >= 8) return;
+  if (i < 0 || i >= 32) return;
   texture = textures[i];
   gl.activeTexture(gl.TEXTURE0 + i);
   gl.bindTexture(gl.TEXTURE_2D, texture);
