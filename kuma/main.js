@@ -192,7 +192,7 @@ function render() {
   bear1.drawShadow();
   bear2.drawShadow();
 
-  window.requestAnimFrame(render); 
+  window.requestAnimFrame(render);
 }
 
 function configureTexture(image, i, reverse) {

@@ -4,8 +4,8 @@ function Component(type,start,numOfPoints,material) {
     start=0;
     numOfPoints=0;
     material=Material.create();
-  } 
-  
+  }
+
   this.type=type;
   this.start=start;
   this.numOfPoints=numOfPoints;
@@ -81,8 +81,8 @@ function Component(type,start,numOfPoints,material) {
     else if (this.type == 2) gl.drawArrays(gl.TRIANGLE_FAN, this.start, this.numOfPoints);
     else if (this.type == 3) gl.drawArrays(gl.TRIANGLE_STRIP, this.start, this.numOfPoints);
   }
-  this.traversal = function(func) {
-
+  this.DLR = function(func) {//以该节点作为根节点进行前序遍历
+    this.func();
   }
 }
 
@@ -129,7 +129,7 @@ function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,materi
       ny=ry*Math.cos(theta1);
       points.push(vec3(x+rback*rx,y+rback*ry,zback),vec3(x+rfront*rx,y+rfront*ry,zfront));
       normals.push(vec3(nx,ny,nz),vec3(nx,ny,nz));
-      texy=i/360;    
+      texy=i/360;
       texs.push(vec2(0.0,texy),vec2(1.0,texy));
     }
     z=(zback+zfront)/2;
@@ -251,14 +251,14 @@ function addTag(tags,material,type,length,stdPos)//增加当前部件的标签
     tagLast=tags[tags.length-1];
     start=tagLast.start+tagLast.numOfPoints;
     tagThis=new Component(type,start,length,material);
-    if(stdPos.length==7){  
+    if(stdPos.length==7){
       tagThis.upPos    =stdPos[0];
       tagThis.downPos  =stdPos[1];
       tagThis.leftPos  =stdPos[2];
       tagThis.rightPos =stdPos[3];
       tagThis.frontPos =stdPos[4];
       tagThis.backPos  =stdPos[5];
-      tagThis.centerPos=stdPos[6];  
+      tagThis.centerPos=stdPos[6];
     }
     tags.push(tagThis);
     return tagThis;
@@ -283,16 +283,20 @@ function medisphere(points,normals,texs,tags,x,y,z,a,b,c,material){
       normals.push(vec3(-rx/a,-ry/b,-rz/c),vec3(-rxd/a,-ryd/b,-rzd/c));
 
       var texx,texy,texxd,texyd;
-      texy=0.5+ry/2;
-      texyd=0.5+ryd/2;
-      if(rz>=0)
-        texx=rx/2+0.5;
-      else
-        texx=1.5-rx/2;
-      if(rzd>=0)
-        texxd=rxd/2+0.5;
-      else
-        texxd=1.5-rxd/2;
+      m=(i>180)?360-i:i;
+      md=(179<i)?359-i:i+1;
+      if(i==360) md=1;
+      texx=m/180;
+      texxd=md/180;
+      texy=ry;
+      texyd=ryd;
+      /*
+      texy=0.5+rz/2;
+      texyd=0.5+rzd/2;
+      texx=rx/2+0.5;
+      texxd=rxd/2+0.5;
+      */
+      /*
       if(j==91){//解决贴图边界的错误问题
         texx=texxd;
         texy=texyd;
@@ -301,7 +305,8 @@ function medisphere(points,normals,texs,tags,x,y,z,a,b,c,material){
         texxd=texx;
         texyd=texy;
       }
-      texs.push(vec2(texx/2,texy),vec2(texxd/2,texyd));
+      */
+      texs.push(vec2(texx,texy),vec2(texxd,texyd));
     }
    }
    stdPos=[
@@ -320,6 +325,6 @@ function square(points,normals,texs,tags,x,y,z,a,material){
   z2=z+a/2;
   points.push(vec3(x1,y,z1),vec3(x1,y,z2),vec3(x2,y,z1),vec3(x2,y,z2));
   normals.push(vec3(0,1,0),vec3(0,1,0),vec3(0,1,0),vec3(0,1,0));
-  texs.push(vec2(0,0),vec2(0,1),vec2(1,0),vec2(1,1));
+  texs.push(vec2(0,0),vec2(0,100),vec2(100,0),vec2(100,100));
   return addTag(tags,material,3,4,[0]);
 }
