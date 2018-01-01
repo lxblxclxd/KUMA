@@ -21,6 +21,8 @@ var camera_default = new Camera();
 var hat1 = new SceneObject();
 var hat2 = new SceneObject();
 
+var scene=new SceneObject();
+
 var camera = camera_default;
 var character = bear1;
 // var thetaTest=-135;
@@ -101,6 +103,11 @@ window.onload = function init() {
 
   // Create a buffer object, initialize it, and associate it with the
   //  associated attribute variable in our vertex shader
+
+  background(scene);
+  scene.offset=[0.0,-0.01,0.0];
+  sendData(scene);
+
   //variable 1
   bear(bear1);
   bear1.offset = [-0.35, 0.2, 0];
@@ -109,38 +116,26 @@ window.onload = function init() {
   //variable 2
   //bear(bear2);
   readObj(bear2,comaru);
-  bear2.offset = [0.35, 0.2, 0];
+  bear2.offset = [0.35, 0, 0];
+  bear2.rMat=rotateY(180);
   sendData(bear2);
 
   christmasHat(hat1);
   hat1.offset = [-0.35, 0.72, 0];
   sendData(hat1);
 
-  christmasHat(hat2);
-  hat2.offset = [0.35, 0.72, 0];
-  sendData(hat2);
+  // christmasHat(hat2);
+  // hat2.offset = [0.35, 0.72, 0];
+  // sendData(hat2);
 
   sun(dotLight);
   dotLight.offset = [0.0, 1.0, 3.0];
   sendData(dotLight);
 
+
   camera.attach(bear1);
 
   addEvents();
-
-  
-  // var iBuffer = gl.createBuffer();
-  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
-  // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(comaru.indices), gl.STATIC_DRAW);
-
-  // // vertex array attribute buffer
-  // var vBuffer = gl.createBuffer();
-  // gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-  // gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(comaru.points), gl.STATIC_DRAW );
-
-  // var vPosition = gl.getAttribLocation( program, "vPosition" );
-  // gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
-  // gl.enableVertexAttribArray( vPosition );
 
   render();
 };
@@ -315,6 +310,8 @@ function render() {
     gl.getUniformLocation(program, "lightPosition"),
     flatten(vec4(dotLight.offset, 1))
   );
+  prepareData(scene);
+  drawObject(scene);
 
   //two bears
   bear1.rMat = rotates(bear1.rMat, bear1.theta);

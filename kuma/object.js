@@ -126,3 +126,12 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     obj.imgReverse=false;
 }
 
+function background(obj){
+    tags=obj.tags;
+    texs=obj.texs;
+    normals=obj.normals;
+    points=obj.points;
+    var sky=medisphere(points,normals,texs,tags,0,0,0,10,10,10,Material.blue());
+    var ground=square(points,normals,texs,tags,0,0,0,40,Material.green());
+  }
+  

@@ -7,6 +7,7 @@ var Color={
     brown : vec4(128 / 255, 64 / 255, 0.0, 1.0),
     skin : vec4(247 / 255, 204 / 255, 179 / 255, 1.0),
     pink : vec4(255 / 255, 128 / 255, 255 / 255, 1.0),
+    green:vec4(0.0,1.0,0.0,1.0),
     undefine :vec4(0.0, 0.0, 0.0, 0.0)
 }
 
@@ -28,6 +29,8 @@ var Material={
     black : function(){return Material.create(Color.black);},
     white : function(){return Material.create(Color.white);},
     red : function(){return Material.create(Color.red);},
+    blue:function(){return Material.create(Color.blue);},
+    green:function(){return Material.create(Color.green);},
     undefine : function(i){
         var mt=Material.create();
         mt.image=i;
