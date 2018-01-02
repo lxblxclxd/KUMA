@@ -12,7 +12,7 @@ var Color={
 }
 
 var Material={
-    create: function(colorA,colorD,colorS,shininess){
+    createNew: function(colorA,colorD,colorS,shininess){
        switch(arguments.length){
            case 0: colorA=Color.undefine;
            case 1: colorD=colorA;
@@ -26,13 +26,13 @@ var Material={
        material.shininess=shininess;
        return material;
     },
-    black : function(){return Material.create(Color.black);},
-    white : function(){return Material.create(Color.white);},
-    red : function(){return Material.create(Color.red);},
-    blue:function(){return Material.create(Color.blue);},
-    green:function(){return Material.create(Color.green);},
+    black : function(){return Material.createNew(Color.black);},
+    white : function(){return Material.createNew(Color.white);},
+    red : function(){return Material.createNew(Color.red);},
+    blue:function(){return Material.createNew(Color.blue);},
+    green:function(){return Material.createNew(Color.green);},
     undefine : function(i){
-        var mt=Material.create();
+        var mt=Material.createNew();
         mt.image=i;
         return mt;
     }

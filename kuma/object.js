@@ -99,7 +99,7 @@ function sun(obj) {
   texs=obj.texs;
   normals=obj.normals;
   points=obj.points;
-  obj.material=Material.create(vec4(0.2,0.2,0.2,1.0),vec4(1.0,1.0,1.0,1.0),vec4(1.0,1.0,1.0,1.0));
+  obj.material=Material.createNew(vec4(0.2,0.2,0.2,1.0),vec4(1.0,1.0,1.0,1.0),vec4(1.0,1.0,1.0,1.0));
   sphere(points,normals,texs, tags,0,0,0,0.2,obj.material);//球体
   obj.colorDirect=Color.red;
 }

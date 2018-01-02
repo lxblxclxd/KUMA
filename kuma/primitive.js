@@ -3,7 +3,7 @@ function Component(type,start,numOfPoints,material) {
     type=0;
     start=0;
     numOfPoints=0;
-    material=Material.create();
+    material=Material.createNew();
   }
 
   this.type=type;
