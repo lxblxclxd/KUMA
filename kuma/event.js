@@ -1,4 +1,11 @@
-function addEvents(document){
+front = [0.0, 0.0, 0.05];
+back = [0.0, 0.0, -0.05];
+upward = [0.0, 0.05, 0.0];
+down = [0.0, -0.05, 0.0];
+left = [0.05, 0.0, 0.0];
+right = [-0.05, 0.0, 0.0];
+
+function addEvents(){
     //event listeners for buttons
     document.getElementById("xRButton").onclick = function () { bear1.theta[xAxis] = (bear1.theta[xAxis] + 5.0) % 10; };
     document.getElementById("yRButton").onclick = function () { bear1.theta[yAxis] = (bear1.theta[yAxis] + 5.0) % 10; };
@@ -26,52 +33,84 @@ function addEvents(document){
     document.getElementById("LightButtonz1").onclick = function () { dotLight.offset[2] += 1.0;  showPosition();};
     document.getElementById("LightButtonz2").onclick = function () { dotLight.offset[2] -= 1.0;  showPosition();};
     document.getElementById("LightReset").onclick = function () { dotLight.offset=[0,1,3];  showPosition();};
- 
+
     showPosition();
-    
+
     function showPosition() {
-        document.getElementById("light-position").innerHTML = dotLight.offset[0]+", "+dotLight.offset[1]+", "+dotLight.offset[2];     
+        document.getElementById("light-position").innerHTML = dotLight.offset[0]+", "+dotLight.offset[1]+", "+dotLight.offset[2];
     }
-    
+
     //listener for keyboard
 
     document.onkeydown = function () {
         var keycode = event.keyCode;
         var realkey = String.fromCharCode(event.keyCode);
 
-        phiold = phi;
+        if (keycode == 87){
+            character.setAction('StandUp');
+            move(character, front);//w
+        }
+        if (keycode == 65) move(character, left);//a
+        if (keycode == 83) move(character, back);//s
+        if (keycode == 68) move(character, right);//d
 
-        //camera
-        if (keycode == 33) radius += 1.0;//pageup
-        if (keycode == 34) if (radius > 1.0) radius -= 1.0;//pagedown
-        if (keycode == 37) theta += dr;//leftArrow
-        if (keycode == 38) { (phi -= dr) % Math.PI; if (phi < -Math.PI) phi += 2 * Math.PI }//upArrow
-        if (keycode == 39) { theta -= dr; theta %= (Math.PI * 2); }//rightArrow
-        if (keycode == 40) { (phi += dr) % Math.PI; if (phi > Math.PI) phi -= 2 * Math.PI; }//downArrow
-        if ((phiold > 0 && phi < -0) || (phiold < -0 && phi > 0))
-            up[yAxis] = -up[yAxis];
+        if(realkey=='1'){
+            character=bear1;
+        }
+        if(realkey=='2'){
+            character=bear2;
+        }
 
-        //bear1
-        if (keycode == 87) bear1.offset = move(upward, bear1.rMat, bear1.offset);//w
-        if (keycode == 65) bear1.offset = move(left, bear1.rMat, bear1.offset);//a
-        if (keycode == 83) bear1.offset = move(down, bear1.rMat, bear1.offset);//s
-        if (keycode == 68) bear1.offset = move(right, bear1.rMat, bear1.offset);//d
-        if (keycode == 81) bear1.offset = move(front, bear1.rMat, bear1.offset);//q
-        if (keycode == 69) bear1.offset = move(back, bear1.rMat, bear1.offset);//e
+        if (keycode == 32) character.setAction('JumpUp');//space
 
-        //bear2
-        if (keycode == 73) bear2.offset = move(upward, bear2.rMat, bear2.offset);//i
-        if (keycode == 74) bear2.offset = move(left, bear2.rMat, bear2.offset);//j
-        if (keycode == 75) bear2.offset = move(down, bear2.rMat, bear2.offset);//k
-        if (keycode == 76) bear2.offset = move(right, bear2.rMat, bear2.offset);//l
-        if (keycode == 85) bear2.offset = move(front, bear2.rMat, bear2.offset);//u
-        if (keycode == 79) bear2.offset = move(back, bear2.rMat, bear2.offset);//o
+        camera.attach(character);
+    }
+
+    //鼠标监听控制视角(Camera)
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+    document.onmousemove = function(){
+        var ctrlKey = event.ctrlKey || event.metaKey;
+        mouseXLast=mouseX;
+        mouseYLast=mouseY;
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        // if(ctrlKey&&mouseX<mouseXLast) theta -=dr;
+        // if(ctrlKey&&) theta += dr;
+        if(ctrlKey)
+        camera.theta+=(mouseX-mouseXLast)/200;
+        if (ctrlKey&&mouseY<mouseYLast) { if(camera.phi<Math.PI/2) camera.phi+=dr;}
+        if (ctrlKey&&mouseY>mouseYLast) {if(camera.phi>0.5) camera.phi -= dr; }
+        camera.theta %= (Math.PI * 2);
+    }
+
+    document.onmousewheel = function(){
+        direction=event.wheelDelta>0?-1.0:1.0;
+        camera.radius+=direction;
+        if(camera.radius<=0.0)
+            camera.radius+=1.0;
     }
 }
 
-function move(dir, mat, offset){//算出移动后的偏移量
-    offset[xAxis] += (bear1.rMat[xAxis][0] * dir[0] + bear1.rMat[xAxis][1] * dir[1] + bear1.rMat[xAxis][2] * dir[2]);
-    offset[yAxis] += (bear1.rMat[yAxis][0] * dir[0] + bear1.rMat[yAxis][1] * dir[1] + bear1.rMat[yAxis][2] * dir[2]);
-    offset[zAxis] += (bear1.rMat[zAxis][0] * dir[0] + bear1.rMat[zAxis][1] * dir[1] + bear1.rMat[zAxis][2] * dir[2]);
+function move(obj,dir){//算出移动后的偏移量
+    mat=obj.rMat;
+    offset=obj.offset;
+    offset[xAxis] += (mat[xAxis][0] * dir[0] + mat[xAxis][1] * dir[1] + mat[xAxis][2] * dir[2]);
+    offset[yAxis] += (mat[yAxis][0] * dir[0] + mat[yAxis][1] * dir[1] + mat[yAxis][2] * dir[2]);
+    offset[zAxis] += (mat[zAxis][0] * dir[0] + mat[zAxis][1] * dir[1] + mat[zAxis][2] * dir[2]);
     return offset;
+}
+
+function rotates(mat, theta,center){//原矩阵根据角度和旋转中心左乘旋转矩阵
+    if (arguments.length == 3)
+        mat=  mult(translate(negate(center)), mat);
+    if(theta[xAxis]!=0)
+        mat = mult(rotateX(theta[xAxis]), mat);
+    if(theta[yAxis]!=0)
+        mat = mult(rotateY(theta[yAxis]), mat);
+    if(theta[zAxis]!=0)
+        mat = mult(rotateZ(theta[zAxis]), mat);
+    if (arguments.length == 3)
+        mat=  mult(translate(center), mat);
+    return mat;
 }
