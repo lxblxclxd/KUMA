@@ -19,12 +19,12 @@ var Material={
            case 2: colorS=Color.undefine;
            case 3: shininess=100.0;
        }
-       var material={};
-       material.ambient=colorA;
-       material.diffuse=colorD;
-       material.specular=colorS;
-       material.shininess=shininess;
-       return material;
+       var self={};
+       self.ambient=colorA;
+       self.diffuse=colorD;
+       self.specular=colorS;
+       self.shininess=shininess;
+       return self;
     },
     black : function(){return Material.createNew(Color.black);},
     white : function(){return Material.createNew(Color.white);},
