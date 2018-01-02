@@ -45,6 +45,23 @@ function Component(type,start,numOfPoints,material) {
   this.lengthz = function() {
     return this.frontPos[2]-this.backPos[2];
   }
+  this.copy = function(){
+    var tag= new Component();
+    tag.type=this.type;
+    tag.start=this.start;
+    tag.numOfPoints=this.numOfPoints;
+    tag.material=this.material;//直接显示的颜色
+    tag.theta=this.theta;//离初始位置的偏转角度在三个方向的分量
+    tag.rootPos=this.rootPos;//物体旋转所绕的点
+    tag.upPos    =this.upPos;
+    tag.downPos  =this.downPos;
+    tag.leftPos  =this.leftPos;
+    tag.rightPos =this.rightPos;
+    tag.frontPos =this.frontPos;
+    tag.backPos  =this.backPos;
+    tag.centerPos=this.centerPos;
+    return tag;
+  }
   this.render = function() {
     gl.uniform1i(
       gl.getUniformLocation(program, "bTexCoord"),
@@ -77,26 +94,12 @@ function Component(type,start,numOfPoints,material) {
       false,flatten(this.calCMT())
     );
     if (this.type == 0) gl.drawElements(gl.TRIANGLES, this.numOfPoints*3, gl.UNSIGNED_SHORT, this.start*3*2 );//起始位置以字节为单位！
-    else if (this.type == 1) gl.drawArrays(gl.TRIANGLES, this.start, this.numOfPoints);
-    else if (this.type == 2) gl.drawArrays(gl.TRIANGLE_FAN, this.start, this.numOfPoints);
-    else if (this.type == 3) gl.drawArrays(gl.TRIANGLE_STRIP, this.start, this.numOfPoints);
-  }
-  this.DLR = function(func) {//以该节点作为根节点进行前序遍历
-    this.func();
+    else gl.drawArrays(this.type, this.start, this.numOfPoints);
   }
 }
 
-function sphere(points,normals,texs,tags,x,y,z,radis,material)
-{
+function sphere(points,normals,texs,tags,x,y,z,radis,material){
   return ellipsoid(points,normals,texs,tags,x,y,z,radis,radis,radis,material);
-}
-
-function cylinderX(points,normals,texs,tags,x,y,z,radis,height,material)//柱面，中心轴平行于x轴
-{
-}
-
-function cylinderY(points,normals,texs,tags,x,y,z,radis,height,material)//柱面，中心轴平行于y轴
-{
 }
 
 function cylinderZ(points,normals,texs,tags,x,y,zback,zfront,radis,material){//柱面，中心轴平行于z轴
@@ -140,7 +143,7 @@ function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,materi
       vec3(x,y,zfront),vec3(x,y,zback),
       vec3(x,y,z)
      ];
-    return addTag(tags,material,3,2*361,stdPos);
+    return addTag(tags,material,gl.TRIANGLE_STRIP,2*361,stdPos);
 }
 
 function wheelXZ(points,normals,texs,tags,x,y,z,r1,r2,material){
@@ -172,7 +175,7 @@ function wheelXZ(points,normals,texs,tags,x,y,z,r1,r2,material){
     vec3(x,y,z+r1+r2),vec3(x,y,z-r1-r2),
     vec3(x,y,z)
    ];
-   return addTag(tags,material,3,2*360*(360+precise)/precise/precise,stdPos);
+   return addTag(tags,material,gl.TRIANGLE_STRIP,2*360*(360+precise)/precise/precise,stdPos);
 }
 
 
@@ -223,28 +226,8 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,material)//椭球
     vec3(x,y,z+c),vec3(x,y,z-c),
     vec3(x,y,z)
    ];
-   return addTag(tags,material,3,180*(360+precise)*2/precise/precise,stdPos);
+   return addTag(tags,material,gl.TRIANGLE_STRIP,180*(360+precise)*2/precise/precise,stdPos);
 }
-
-// function parabola(p1,p2,p3,n){//X(a,b,c)=y n个点的xy平面抛物线y=ax2+bx+c
-//   X=mat3(p1[0]*p1[0],p1[0],1,
-//           p2[0]*p2[0],p2[0],1,
-//           p3[0]*p3[0],p3[0],1);
-//   y=vec3(p1[1],p2[1],p3[1]);
-//   Xn=inverse(X);
-//   a=Xn[0][0]*y[0]+Xn[0][1]*y[1]+Xn[0][2]*y[2];
-//   b=Xn[1][0]*y[0]+Xn[1][1]*y[1]+Xn[1][2]*y[2];
-//   c=Xn[2][0]*y[0]+Xn[2][1]*y[1]+Xn[2][2]*y[2];
-//   v=[p1];
-//   for(i=1;i<n;i++)
-//   {
-//       x1=(p3[0]-p1[0])/n*i+p1[0];
-//       y1=a*x1*x1+b*x1+c;
-//       v.push(vec2(x1,y1));
-//   }
-//   return v;
-// }
-
 
 function addTag(tags,material,type,length,stdPos)//增加当前部件的标签
 {
@@ -315,7 +298,7 @@ function medisphere(points,normals,texs,tags,x,y,z,a,b,c,material){
     vec3(x,y,z+c),vec3(x,y,z-c),
     vec3(x,y,z)
    ];
-   return addTag(tags,material,3,90*(360+precise)*2/precise/precise,stdPos);
+   return addTag(tags,material,gl.TRIANGLE_STRIP,90*(360+precise)*2/precise/precise,stdPos);
 }
 
 function square(points,normals,texs,tags,x,y,z,a,material){
@@ -326,5 +309,5 @@ function square(points,normals,texs,tags,x,y,z,a,material){
   points.push(vec3(x1,y,z1),vec3(x1,y,z2),vec3(x2,y,z1),vec3(x2,y,z2));
   normals.push(vec3(0,1,0),vec3(0,1,0),vec3(0,1,0),vec3(0,1,0));
   texs.push(vec2(0,0),vec2(0,100),vec2(100,0),vec2(100,100));
-  return addTag(tags,material,3,4,[0]);
+  return addTag(tags,material,gl.TRIANGLE_STRIP,4,[0]);
 }

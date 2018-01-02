@@ -27,16 +27,21 @@ function SceneObject() {
   this.drawShadow = function(){
       drawShadow(this);
   }   
-//   this.copy = function(){
-//       var obj = new SceneObject();
-//       obj.vBuffer = this.vBuffer;
-//       obj.nBuffer = this.nBuffer;
-//       obj.tBuffer = this.tBuffer;
-//       obj.tags = this.tags;
-//       obj.get = this.get;
-//       obj.name = this.name;
-//       return obj;
-//   }
+  this.copy = function(){
+      var obj = new SceneObject();
+      obj.vBuffer = this.vBuffer;
+      obj.nBuffer = this.nBuffer;
+      obj.tBuffer = this.tBuffer;
+      obj.tags = this.tags;
+      obj.get = {}
+      count = 0;
+      for(var c in this.get){
+        obj.get[c]=obj.tags[count];
+        count++;
+      }
+      obj.name = this.name;
+      return obj;
+  }
 }
 
 function bear(obj) {
@@ -86,6 +91,7 @@ function bear(obj) {
 
     //leftLeg.theta=[-135,0,0];
     obj.imgReverse=true;
+    obj.centerPos=body.centerPos;
 }
 
 function sun(obj) {
@@ -121,7 +127,9 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     obj.name=objRaw.name;
 
     for(j = 0,len=pointsRaw.length/3; j < len; j++) {
-        points.push(pointsRaw.splice(0,3));
+        p=pointsRaw.splice(0,3);
+        p[2]=-p[2];
+        points.push(p);
     }
 
     for(j = 0,len=texsRaw.length/2; j < len; j++) {
@@ -129,8 +137,11 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     }
 
     for(j = 0,len=normalsRaw.length/3; j < len; j++) {
-        normals.push(normalsRaw.splice(0,3));
+        p=normalsRaw.splice(0,3);
+        p[2]=-p[2];
+        normals.push(p);
     }
+    obj.get = {};
     im=[1,0,1,1,1,1,1,4,1,0,0,3,0,0,0,0,0,0,7,0,0,0,0,0,0,4,3,3,3,2];
     obj.indices=indicesRaw;
     for(j = 0;j < tagsRaw.length-1;j++){
@@ -140,6 +151,7 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     }
     //addTag(tags,Material.red(),0,indicesRaw.length/3,[0]);
     obj.imgReverse=false;
+    obj.centerPos=vec3(0,1.5,0);
 }
 
 function background(obj){

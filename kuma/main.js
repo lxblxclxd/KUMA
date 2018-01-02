@@ -41,7 +41,7 @@ function Camera() {
   this.aspect; // Viewport aspect ratio
 
   this.radius = 2.0;
-  this.theta = -Math.PI / 2;
+  this.theta = Math.PI / 2;
   this.phi = Math.PI / 2;
   this.eye;
   this.at = vec3(0.0, 0.0, 0.0);
@@ -62,7 +62,7 @@ function Camera() {
     return perspective(this.fovy, this.aspect, this.near, this.far);
   };
   this.attach = function(obj) {
-    this.at = vec3(obj.offset);
+    this.at = add(vec3(obj.offset), obj.centerPos);
   };
 }
 
@@ -120,7 +120,7 @@ window.onload = function init() {
   //bear2 = bear1.copy();
   readObj(bear2,comaru);
   bear2.offset = [0.35, 0.0, 0];
-  bear2.rMat=rotateY(180);
+  //bear2.rMat=rotateY(180);
   sendData(bear2);
 
   christmasHat(hat1);

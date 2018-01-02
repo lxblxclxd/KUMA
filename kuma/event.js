@@ -46,12 +46,17 @@ function addEvents(){
         var keycode = event.keyCode;
         var realkey = String.fromCharCode(event.keyCode);
 
-        if (keycode == 87){
-            character.setAction('StandUp');
-            move(character, front);//w
+        if (keycode == 87){//w
+            //if(character.get['leftLeg'].theta!=-90)//如果不是站立
+                character.setAction('StandUp');
+            //else
+                move(character, front);
         }
         if (keycode == 65) move(character, left);//a
-        if (keycode == 83) move(character, back);//s
+        if (keycode == 83){
+            character.setAction('SitDown');
+            move(character, back);//s
+        }
         if (keycode == 68) move(character, right);//d
 
         if(realkey=='1'){
@@ -71,16 +76,17 @@ function addEvents(){
     mouseY = event.clientY;
     document.onmousemove = function(){
         var ctrlKey = event.ctrlKey || event.metaKey;
+        var altKey = event.altKey;
         mouseXLast=mouseX;
         mouseYLast=mouseY;
         mouseX = event.clientX;
         mouseY = event.clientY;
         // if(ctrlKey&&mouseX<mouseXLast) theta -=dr;
         // if(ctrlKey&&) theta += dr;
-        if(ctrlKey)
+        if(altKey)
         camera.theta+=(mouseX-mouseXLast)/200;
-        if (ctrlKey&&mouseY<mouseYLast) { if(camera.phi<Math.PI/2) camera.phi+=dr;}
-        if (ctrlKey&&mouseY>mouseYLast) {if(camera.phi>0.5) camera.phi -= dr; }
+        if (altKey&&mouseY<mouseYLast) { if(camera.phi<Math.PI/2) camera.phi+=dr;}
+        if (altKey&&mouseY>mouseYLast) {if(camera.phi>0.5) camera.phi -= dr; }
         camera.theta %= (Math.PI * 2);
     }
 
