@@ -21,7 +21,7 @@ var camera_default = new Camera();
 var hat1 = new SceneObject();
 var hat2 = new SceneObject();
 
-var scene=new SceneObject();
+var scene = new SceneObject();
 
 var camera = camera_default;
 var character = bear1;
@@ -30,8 +30,8 @@ var character = bear1;
 // var jumpHeight=0;
 // var directionj=0.5;
 
-var textures=[];
-var images=[];
+var textures = [];
+var images = [];
 
 var dr = radians(5.0);
 function Camera() {
@@ -73,9 +73,7 @@ window.onload = function init() {
   camera.aspect = canvas.width / canvas.height;
 
   gl = WebGLUtils.setupWebGL(canvas);
-  if (!gl) {
-    alert("WebGL isn't available");
-  }
+  if (!gl) alert("WebGL isn't available");
 
   // First, initialize the vertices of oSur 3D gasket
   // Four vertices on unit circle
@@ -99,7 +97,7 @@ window.onload = function init() {
   vNormal = gl.getAttribLocation(program, "vNormal");
   vTexCoord = gl.getAttribLocation(program, "vTexCoord");
 
-  for(var i=0;i<32;i++) {
+  for (var i = 0; i < 32; i++) {
     textures.push(gl.createTexture());
   }
 
@@ -107,7 +105,7 @@ window.onload = function init() {
   //  associated attribute variable in our vertex shader
 
   background(scene);
-  scene.offset=[0.0,-0.01,0.0];
+  scene.offset = [0.0, -0.01, 0.0];
   sendData(scene);
 
   //variable 1
@@ -118,9 +116,9 @@ window.onload = function init() {
   //variable 2
   //bear(bear2);
   //bear2 = bear1.copy();
-  readObj(bear2,comaru);
+  readObj(bear2, comaru);
   bear2.offset = [0.35, 0.0, 0];
-  bear2.rMat=rotateY(180);
+  bear2.rMat = rotateY(180);
   sendData(bear2);
 
   christmasHat(hat1);
@@ -134,7 +132,6 @@ window.onload = function init() {
   sun(dotLight);
   dotLight.offset = [0.0, 1.0, 3.0];
   sendData(dotLight);
-
 
   camera.attach(bear1);
 

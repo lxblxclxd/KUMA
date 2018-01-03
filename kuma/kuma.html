@@ -5,102 +5,101 @@
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <title>kuma4</title>
 
-
   <script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec3 vPosition;
-attribute  vec3 vNormal;
-attribute vec2 vTexCoord;
-varying float s,t;
-varying vec4 ambient;
-varying vec4 diffuse;
-varying vec4 specular;
-varying float Kd;
-varying vec3 L;
-varying vec3 N;
+  attribute vec3 vPosition;
+  attribute  vec3 vNormal;
+  attribute vec2 vTexCoord;
+  varying float s,t;
+  varying vec4 ambient;
+  varying vec4 diffuse;
+  varying vec4 specular;
+  varying float Kd;
+  varying vec3 L;
+  varying vec3 N;
 
-uniform vec4 ambientProduct, diffuseProduct, specularProduct;
-uniform mat4 cmt_R;
-uniform mat4 cmt_T;
-uniform mat4 cmtPart;//物体部件的运动变换矩阵
-uniform mat4 modelView;
-uniform mat4 projection;//投影矩阵
-uniform vec4 lightPosition;
-uniform float shininess;
+  uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+  uniform mat4 cmt_R;
+  uniform mat4 cmt_T;
+  uniform mat4 cmtPart;//物体部件的运动变换矩阵
+  uniform mat4 modelView;
+  uniform mat4 projection;//投影矩阵
+  uniform vec4 lightPosition;
+  uniform float shininess;
 
-void
-main()
-{
-  //颜色部分
-  vec4 pos=modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
-  if(lightPosition.w==0.0) L=normalize((modelView*lightPosition).xyz);
-  else L=normalize((modelView*lightPosition).xyz-pos.xyz);
-  vec3 E=normalize(-pos.xyz);
-  vec3 H=normalize(L+E);
-  N=normalize((modelView*cmt_R*cmtPart*vec4(normalize(vNormal),0)).xyz);
-  ambient=ambientProduct;
-  Kd=max(dot(L,N),0.0);
-  diffuse=Kd*diffuseProduct;
-  float Ks=pow(max(dot(N,H),0.0),shininess);
-  specular=Ks*specularProduct;
-  if(dot(L,N)<0.0) specular=vec4(0.0,0.0,0.0,1.0);
+  void
+  main()
+  {
+    //颜色部分
+    vec4 pos=modelView*cmt_T*cmt_R*cmtPart* vec4(vPosition,1);
+    if(lightPosition.w==0.0) L=normalize((modelView*lightPosition).xyz);
+    else L=normalize((modelView*lightPosition).xyz-pos.xyz);
+    vec3 E=normalize(-pos.xyz);
+    vec3 H=normalize(L+E);
+    N=normalize((modelView*cmt_R*cmtPart*vec4(normalize(vNormal),0)).xyz);
+    ambient=ambientProduct;
+    Kd=max(dot(L,N),0.0);
+    diffuse=Kd*diffuseProduct;
+    float Ks=pow(max(dot(N,H),0.0),shininess);
+    specular=Ks*specularProduct;
+    if(dot(L,N)<0.0) specular=vec4(0.0,0.0,0.0,1.0);
 
-  s=vTexCoord.x;
-  t=vTexCoord.y;
+    s=vTexCoord.x;
+    t=vTexCoord.y;
 
-  //位置部分
-  gl_Position = projection*pos;
-  //gl_Position=projection*modelView*vec4(vPosition,1);
-}
-</script>
+    //位置部分
+    gl_Position = projection*pos;
+    //gl_Position=projection*modelView*vec4(vPosition,1);
+  }
+  </script>
 
   <script id="fragment-shader" type="x-shader/x-fragment">
-precision mediump float;
+  precision mediump float;
 
-varying vec4 ambient;
-varying vec4 diffuse;
-varying vec4 specular;
-uniform vec4 colorDirect;
-varying float s,t;
-varying float Kd;
-uniform sampler2D texture0;
-uniform sampler2D texture1;
-uniform sampler2D texture2;
-uniform sampler2D texture3;
-uniform sampler2D texture4;
-uniform sampler2D texture5;
-uniform sampler2D texture6;
-uniform sampler2D texture7;
-uniform int bTexCoord;
-void
-main()
-{
-  //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
-  vec4 fcolor;
-  if(colorDirect.w==1.0) fcolor=colorDirect;
-  else{
-    if(diffuse.w!=0.0||ambient.w!=0.0)
-      fcolor=ambient+diffuse+specular;
-    else if(bTexCoord==0)
-      fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
-    else if(bTexCoord==1)
-      fcolor=0.4*texture2D(texture1,vec2(s,t))+Kd*texture2D(texture1,vec2(s,t))+specular;
-    else if(bTexCoord==2)
-      fcolor=0.4*texture2D(texture2,vec2(s,t))+Kd*texture2D(texture2,vec2(s,t))+specular;
-    else if(bTexCoord==3)
-      fcolor=0.4*texture2D(texture3,vec2(s,t))+Kd*texture2D(texture3,vec2(s,t))+specular;
-    else if(bTexCoord==4)
-      fcolor=0.4*texture2D(texture4,vec2(s,t))+Kd*texture2D(texture4,vec2(s,t))+specular;
-    else if(bTexCoord==5)
-      fcolor=0.4*texture2D(texture5,vec2(s,t))+Kd*texture2D(texture5,vec2(s,t))+specular;
-    else if(bTexCoord==6)
-      fcolor=0.4*texture2D(texture6,vec2(s,t))+Kd*texture2D(texture6,vec2(s,t))+specular;
-    else if(bTexCoord==7)
-      fcolor=0.4*texture2D(texture7,vec2(s,t))+Kd*texture2D(texture7,vec2(s,t))+specular;
-    fcolor.a=1.0;
+  varying vec4 ambient;
+  varying vec4 diffuse;
+  varying vec4 specular;
+  uniform vec4 colorDirect;
+  varying float s,t;
+  varying float Kd;
+  uniform sampler2D texture0;
+  uniform sampler2D texture1;
+  uniform sampler2D texture2;
+  uniform sampler2D texture3;
+  uniform sampler2D texture4;
+  uniform sampler2D texture5;
+  uniform sampler2D texture6;
+  uniform sampler2D texture7;
+  uniform int bTexCoord;
+  void
+  main()
+  {
+    //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+    vec4 fcolor;
+    if(colorDirect.w==1.0) fcolor=colorDirect;
+    else{
+      if(diffuse.w!=0.0||ambient.w!=0.0)
+        fcolor=ambient+diffuse+specular;
+      else if(bTexCoord==0)
+        fcolor=0.4*texture2D(texture0,vec2(s,t))+Kd*texture2D(texture0,vec2(s,t))+specular;
+      else if(bTexCoord==1)
+        fcolor=0.4*texture2D(texture1,vec2(s,t))+Kd*texture2D(texture1,vec2(s,t))+specular;
+      else if(bTexCoord==2)
+        fcolor=0.4*texture2D(texture2,vec2(s,t))+Kd*texture2D(texture2,vec2(s,t))+specular;
+      else if(bTexCoord==3)
+        fcolor=0.4*texture2D(texture3,vec2(s,t))+Kd*texture2D(texture3,vec2(s,t))+specular;
+      else if(bTexCoord==4)
+        fcolor=0.4*texture2D(texture4,vec2(s,t))+Kd*texture2D(texture4,vec2(s,t))+specular;
+      else if(bTexCoord==5)
+        fcolor=0.4*texture2D(texture5,vec2(s,t))+Kd*texture2D(texture5,vec2(s,t))+specular;
+      else if(bTexCoord==6)
+        fcolor=0.4*texture2D(texture6,vec2(s,t))+Kd*texture2D(texture6,vec2(s,t))+specular;
+      else if(bTexCoord==7)
+        fcolor=0.4*texture2D(texture7,vec2(s,t))+Kd*texture2D(texture7,vec2(s,t))+specular;
+      fcolor.a=1.0;
+    }
+    gl_FragColor = fcolor;
   }
-  gl_FragColor = fcolor;
-}
-</script>
+  </script>
 
   <script type="text/javascript" src="../Common/webgl-utils.js"></script>
   <script type="text/javascript" src="../Common/initShaders.js"></script>
@@ -116,70 +115,70 @@ main()
 
 <body>
   <div>
-  <div style="position:absolute;left: 0px;top:0px">
+    <div style="position:absolute;left: 0px;top:0px">
       <canvas id="gl-canvas" width="2048" height="768">
-    Oops ... your browser doesn't support the HTML5 canvas element
-  </canvas>
-  </div>
-  <br/>
-  <div style="position:absolute;left: 100px;top:400px">
-    <h3 class="">执行对象：
-      <span style="color:crimson" id="axis">熊一</span>
-    </h3>
-    <button id="xRButton">Rotate X</button>
-    <button id="yRButton">Rotate Y</button>
-    <button id="zRButton">Rotate Z</button>
-    <button id="xTButton">Translation X+</button>
-    <button id="yTButton">Translation Y+</button>
-    <button id="xTnButton">Translation X-</button>
-    <button id="yTnButton">Translation Y-</button>
-    <button id="rsButton">Reset</button>
-  </div>
+        Oops ... your browser doesn't support the HTML5 canvas element
+      </canvas>
+    </div>
+    <br/>
+    <div style="position:absolute;left: 100px;top:400px">
+      <h3 class="">执行对象：
+        <span style="color:crimson" id="axis">熊一</span>
+      </h3>
+      <button id="xRButton">Rotate X</button>
+      <button id="yRButton">Rotate Y</button>
+      <button id="zRButton">Rotate Z</button>
+      <button id="xTButton">Translation X+</button>
+      <button id="yTButton">Translation Y+</button>
+      <button id="xTnButton">Translation X-</button>
+      <button id="yTnButton">Translation Y-</button>
+      <button id="rsButton">Reset</button>
+    </div>
 
-  <div style="position:absolute;left: 100px;top:500px">
-    <h3 class="">执行对象：
-      <span style="color:crimson" id="axis">熊二</span>
-    </h3>
+    <div style="position:absolute;left: 100px;top:500px">
+      <h3 class="">执行对象：
+        <span style="color:crimson" id="axis">熊二</span>
+      </h3>
 
-    <button id="xRButton2">Rotate X</button>
-    <button id="yRButton2">Rotate Y</button>
-    <button id="zRButton2">Rotate Z</button>
-    <button id="xTButton2">Translation X+</button>
-    <button id="yTButton2">Translation Y+</button>
-    <button id="xTnButton2">Translation X-</button>
-    <button id="yTnButton2">Translation Y-</button>
-    <button id="rsButton2">Reset</button>
-  </div>
+      <button id="xRButton2">Rotate X</button>
+      <button id="yRButton2">Rotate Y</button>
+      <button id="zRButton2">Rotate Z</button>
+      <button id="xTButton2">Translation X+</button>
+      <button id="yTButton2">Translation Y+</button>
+      <button id="xTnButton2">Translation X-</button>
+      <button id="yTnButton2">Translation Y-</button>
+      <button id="rsButton2">Reset</button>
+    </div>
 
-
-  <div style="position:absolute;left: 100px;top:600px">
-    <h3 class="">执行对象：
-      <span style="color:crimson" id="axis">光源</span><div id="light-position" style="float:right;"></div>
-    </h3>
-    <p>
-      <button id="LightButtonx1">Increase X</button>
-      <button id="LightButtonx2">Decrease X</button>
-      <button id="LightButtony1">Increase Y</button>
-      <button id="LightButtony2">Decrease Y</button>
-      <button id="LightButtonz1">Increase Z</button>
-      <button id="LightButtonz2">Decrease Z</button>
-      <button id="LightReset">Reset</button>
-    </p>
-  </div>
-  <div>
-  <img id = "bear0" src = "img/1.bmp" hidden></img>
-  <img id = "bear1" src = "img/3.bmp" hidden></img>
-  <img id = "comaru0" src="../img/hada.png" hidden></img>
-  <img id = "comaru1" src="../img/huku.png" hidden></img>
-  <img id = "comaru2" src="../img/huku2.png" hidden></img>
-  <img id = "comaru3" src="../img/kami.png" hidden></img>
-  <img id = "comaru4" src="../img/rfb.png" hidden></img>
-  <img id = "comaru5" src="../img/toon-se-ra-.bmp" hidden></img>
-  <img id = "comaru6" src="../img/toon-skin.bmp" hidden></img>
-  <img id = "comaru7" src="../img/touka.png" hidden></img>
-  <img id = "background0" src = "../img/sky3.png" hidden></img>
-  <img id = "background1" src = "../img/ground.png" hidden></img>
-</div>
+    <div style="position:absolute;left: 100px;top:600px">
+      <h3 class="">执行对象：
+        <span style="color:crimson" id="axis">光源</span>
+        <div id="light-position" style="float:right;"></div>
+      </h3>
+      <p>
+        <button id="LightButtonx1">Increase X</button>
+        <button id="LightButtonx2">Decrease X</button>
+        <button id="LightButtony1">Increase Y</button>
+        <button id="LightButtony2">Decrease Y</button>
+        <button id="LightButtonz1">Increase Z</button>
+        <button id="LightButtonz2">Decrease Z</button>
+        <button id="LightReset">Reset</button>
+      </p>
+    </div>
+    <div>
+      <img id="bear0" src="img/1.bmp" hidden></img>
+      <img id="bear1" src="img/3.bmp" hidden></img>
+      <img id="comaru0" src="../img/hada.png" hidden></img>
+      <img id="comaru1" src="../img/huku.png" hidden></img>
+      <img id="comaru2" src="../img/huku2.png" hidden></img>
+      <img id="comaru3" src="../img/kami.png" hidden></img>
+      <img id="comaru4" src="../img/rfb.png" hidden></img>
+      <img id="comaru5" src="../img/toon-se-ra-.bmp" hidden></img>
+      <img id="comaru6" src="../img/toon-skin.bmp" hidden></img>
+      <img id="comaru7" src="../img/touka.png" hidden></img>
+      <img id="background0" src="../img/sky3.png" hidden></img>
+      <img id="background1" src="../img/ground.png" hidden></img>
+    </div>
 </body>
 
 </html>
