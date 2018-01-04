@@ -27,21 +27,6 @@ function SceneObject() {
   this.drawShadow = function(){
       drawShadow(this);
   }   
-  this.copy = function(){
-      var obj = new SceneObject();
-      obj.vBuffer = this.vBuffer;
-      obj.nBuffer = this.nBuffer;
-      obj.tBuffer = this.tBuffer;
-      obj.tags = this.tags;
-      obj.get = {}
-      count = 0;
-      for(var c in this.get){
-        obj.get[c]=obj.tags[count];
-        count++;
-      }
-      obj.name = this.name;
-      return obj;
-  }
 }
 
 function bear(obj) {

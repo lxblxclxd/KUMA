@@ -45,54 +45,19 @@ function Component(type,start,numOfPoints,material) {
   this.lengthz = function() {
     return this.frontPos[2]-this.backPos[2];
   }
-  this.copy = function(){
-    var tag= new Component();
-    tag.type=this.type;
-    tag.start=this.start;
-    tag.numOfPoints=this.numOfPoints;
-    tag.material=this.material;//直接显示的颜色
-    tag.theta=this.theta;//离初始位置的偏转角度在三个方向的分量
-    tag.rootPos=this.rootPos;//物体旋转所绕的点
-    tag.upPos    =this.upPos;
-    tag.downPos  =this.downPos;
-    tag.leftPos  =this.leftPos;
-    tag.rightPos =this.rightPos;
-    tag.frontPos =this.frontPos;
-    tag.backPos  =this.backPos;
-    tag.centerPos=this.centerPos;
-    return tag;
-  }
   this.render = function() {
-    gl.uniform1i(
-      gl.getUniformLocation(program, "bTexCoord"),
-      this.material.image
-    );
-    gl.uniform4fv(
-      gl.getUniformLocation(program, "ambientProduct"),
-      flatten(mult(dotLight.material.ambient, this.material.ambient))
-    );
-    gl.uniform4fv(
-      gl.getUniformLocation(program, "diffuseProduct"),
-      flatten(mult(dotLight.material.diffuse, this.material.diffuse))
-    );
-    gl.uniform4fv(
-      gl.getUniformLocation(program, "specularProduct"),
-      flatten(mult(dotLight.material.specular, this.material.specular))
-    );
-    gl.uniform1f(
-      gl.getUniformLocation(program, "shininess"),
-      this.material.shininess
-    );
+    gl.uniform1i(gl.getUniformLocation(program, "bTexCoord"),this.material.image);
+    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),flatten(mult(dotLight.material.ambient, this.material.ambient)));
+    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),flatten(mult(dotLight.material.diffuse, this.material.diffuse)));
+    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"),flatten(mult(dotLight.material.specular,this.material.specular)));
+    gl.uniform1f(gl.getUniformLocation(program, "shininess"),this.material.shininess);
     // if(i==5||i==7)
     //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(0.15,-0.08,0),mult(rotateX(thetaTest),translate(-0.15,0.08,0)) )));
     // else if(i==6||i==8)
     //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mult(translate(-0.15,-0.08,0),mult(rotateX(-thetaTest-180),translate(0.15,0.08,0)) )));
     // else
     //     gl.uniformMatrix4fv(gl.getUniformLocation(program,"cmtPart"),false, flatten(mat4()));
-    gl.uniformMatrix4fv(
-      gl.getUniformLocation(program, "cmtPart"),
-      false,flatten(this.calCMT())
-    );
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "cmtPart"),false,flatten(this.calCMT()));
     if (this.type == 0) gl.drawElements(gl.TRIANGLES, this.numOfPoints*3, gl.UNSIGNED_SHORT, this.start*3*2 );//起始位置以字节为单位！
     else gl.drawArrays(this.type, this.start, this.numOfPoints);
   }
