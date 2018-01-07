@@ -192,6 +192,7 @@ function render() {
   //shadow
   bear1.drawShadow();
   bear2.drawShadow();
+  hat1.drawShadow();
 
   window.requestAnimFrame(render);
 }
