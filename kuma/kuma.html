@@ -76,7 +76,7 @@ main()
 {
   //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
   vec4 fcolor;
-  if(colorDirect.w==1.0) fcolor=colorDirect;
+  if(colorDirect.w==1.0) fcolor=colorDirect;//判断是否是光源，不需要加明暗
   else{
     if(diffuse.w!=0.0||ambient.w!=0.0)
       fcolor=ambient+diffuse+specular;

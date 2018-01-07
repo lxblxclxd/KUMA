@@ -42,7 +42,7 @@ function addEvents(){
 
     //listener for keyboard
 
-    document.onkeydown = function () {
+    document.onkeydown = function () {//键盘响应
         var keycode = event.keyCode;
         var realkey = String.fromCharCode(event.keyCode);
 
@@ -76,7 +76,7 @@ function addEvents(){
     //鼠标监听控制视角(Camera)
     mouseX = event.clientX;
     mouseY = event.clientY;
-    document.onmousemove = function(){
+    document.onmousemove = function(){//鼠标移动
         var ctrlKey = event.ctrlKey || event.metaKey;
         var altKey = event.altKey;
         mouseXLast=mouseX;
@@ -92,7 +92,7 @@ function addEvents(){
         camera.theta %= (Math.PI * 2);
     }
 
-    document.onmousewheel = function(){
+    document.onmousewheel = function(){//滚轮实现缩放
         direction=event.wheelDelta>0?-1.0:1.0;
         camera.radius+=direction;
         if(camera.radius<=0.0)

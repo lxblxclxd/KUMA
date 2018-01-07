@@ -13,15 +13,15 @@ var vPosition, vNormal, vTexCoord; //对应html文件中的变量
 
 var precise = 5; //精度
 
-var bear1 = new SceneObject();
+var bear1 = new SceneObject();//熊
 var bear2 = new SceneObject();
-var dotLight = new SceneObject();
-var camera_default = new Camera();
+var dotLight = new SceneObject();//光源
+var camera_default = new Camera();//相机
 
-var hat1 = new SceneObject();
+var hat1 = new SceneObject();//圣诞帽
 var hat2 = new SceneObject();
 
-var scene=new SceneObject();
+var scene=new SceneObject();//背景，包括天空和背景
 
 var camera = camera_default;
 var character = bear1;
@@ -179,7 +179,7 @@ function render() {
   bear2.nextAction();
   bear2.render();
 
-  
+
   hat1.offset=[bear1.offset[0],bear1.offset[1]+0.72,bear1.offset[2]];
   hat1.render();
 
