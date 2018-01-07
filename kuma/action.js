@@ -1,3 +1,5 @@
+//动作设计
+
 var fps = 20;
 var dmove = 0.002;
 var dtheta = 5.0; //5度

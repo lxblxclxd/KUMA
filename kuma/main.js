@@ -1,4 +1,4 @@
-//v4.1.0 kuma封装之前
+//主文件，包括init初始化和render绘制
 
 var canvas;
 var gl;

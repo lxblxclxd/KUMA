@@ -1,3 +1,5 @@
+//建模
+
 function SceneObject() {
   this.points = [];
   this.colors = [];

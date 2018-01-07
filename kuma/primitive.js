@@ -1,3 +1,5 @@
+//图元
+
 function Component(type,start,numOfPoints,material) {
   if (arguments.length == 0) {
     type=0;
