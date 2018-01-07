@@ -127,10 +127,9 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
         normals.push(p);
     }
     obj.get = {};
-    im=[1,0,1,1,1,1,1,4,1,0,0,3,0,0,0,0,0,0,7,0,0,0,0,0,0,4,3,3,3,2];
     obj.indices=indicesRaw;
     for(j = 0;j < tagsRaw.length-1;j++){
-        i=im[j];
+        i=objRaw.imgs[j];
         len=tagsRaw[j+1]-tagsRaw[j];
         addTag(tags,Material.undefine(i),0,len,[0]);
     }
