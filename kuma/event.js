@@ -47,7 +47,7 @@ function addEvents(){
         var realkey = String.fromCharCode(event.keyCode);
 
         if (keycode == 87){//w
-            if(character.get['leftLeg'].theta[0] >-90)//如果不是站立
+            if(character.get['leftLeg'].theta[0] > -90)//如果不是站立
                 character.setAction('StandUp');
             else
                 character.setAction('Walk');

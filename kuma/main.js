@@ -112,7 +112,7 @@ window.onload = function init() {
 
   //variable 1
   bear(bear1);
-  bear1.offset = [-0.35, 0.2, 0];
+  bear1.offset = [-0.35, 0.0, 0];
   sendData(bear1);
 
   //variable 2
@@ -132,7 +132,7 @@ window.onload = function init() {
   // sendData(hat2);
 
   sun(dotLight);
-  dotLight.offset = [0.0, 1.0, 3.0];
+  dotLight.offset = [5.0, 4.0, 7.0];
   sendData(dotLight);
 
 
@@ -153,7 +153,6 @@ function render() {
   // if(thetaTest<-135)
   //     direction=5;
   // thetaTest+=direction;
-
   //camera and light
   gl.uniformMatrix4fv(
     gl.getUniformLocation(program, "modelView"),
@@ -180,6 +179,8 @@ function render() {
   bear2.nextAction();
   bear2.render();
 
+  
+  hat1.offset=[bear1.offset[0],bear1.offset[1]+0.72,bear1.offset[2]];
   hat1.render();
 
   // prepareData(hat2);
