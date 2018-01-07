@@ -28,7 +28,7 @@ function SceneObject() {
   }
   this.drawShadow = function(){
       drawShadow(this);
-  }   
+  }
 }
 
 function bear(obj) {
@@ -81,14 +81,14 @@ function bear(obj) {
     obj.centerPos=body.centerPos;
 }
 
-function sun(obj) {
+function sun(obj) {//可见光源
   tags=obj.tags;
   texs=obj.texs;
   normals=obj.normals;
   points=obj.points;
   obj.material=Material.createNew(vec4(0.2,0.2,0.2,1.0),vec4(1.0,1.0,1.0,1.0),vec4(1.0,1.0,1.0,1.0));
   sphere(points,normals,texs, tags,0,0,0,0.2,obj.material);//球体
-  obj.colorDirect=Color.red;
+  obj.colorDirect=Color.red;//可见光源无明暗
 }
 
 function christmasHat(obj) {
@@ -140,7 +140,7 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     obj.centerPos=vec3(0,1.5,0);
 }
 
-function background(obj){
+function background(obj){//背景，包括天空和地面
     tags=obj.tags;
     texs=obj.texs;
     normals=obj.normals;
@@ -154,23 +154,23 @@ function background(obj){
   };
     obj.imgReverse=true;
   }
-  
+
 
   function sendData(obj) {
     obj.vBuffer = gl.createBuffer(); //创建缓存区
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer); //绑定缓存区
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.points), gl.STATIC_DRAW); //向缓存区传输数据
-  
+
     if (!obj.colorDirect) {
       obj.nBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normals), gl.STATIC_DRAW);
-  
+
       obj.tBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.texs), gl.STATIC_DRAW);
     }
-  
+
     if (obj.indices) {
       obj.iBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.iBuffer);
@@ -191,21 +191,21 @@ function background(obj){
       images.push(image);
     }
   }
-  
+
   function prepareData(obj) {
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer); //绑定对应缓存区
     gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0); //从该缓存区中取数
     gl.enableVertexAttribArray(vPosition); //开启取数
-  
+
     if (!obj.colorDirect) {
       gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
       gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(vNormal);
-  
+
       gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
       gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(vTexCoord);
-  
+
       gl.uniform4fv(
         gl.getUniformLocation(program, "colorDirect"),
         flatten(vec4(0, 0, 0, 0))
@@ -218,7 +218,7 @@ function background(obj){
       gl.disableVertexAttribArray(vNormal);
       gl.disableVertexAttribArray(vTexCoord);
     }
-  
+
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "cmt_R"),
       false,
@@ -230,13 +230,13 @@ function background(obj){
       flatten(translate(obj.offset))
     );
   }
-  
+
 function drawObject(obj) {
     for (var i = 1; i < obj.tags.length; i++) {
       obj.tags[i].render();
     }
   }
-  
+
   function drawShadow(obj) {
     gl.uniform4fv(
       gl.getUniformLocation(program, "colorDirect"),

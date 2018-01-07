@@ -69,7 +69,7 @@ function Component(type,start,numOfPoints,material) {
   }
 }
 
-function sphere(points,normals,texs,tags,x,y,z,radis,material){
+function sphere(points,normals,texs,tags,x,y,z,radis,material){//球体看作特殊的椭球体，球心坐标（x,y,z），半径为radius
   return ellipsoid(points,normals,texs,tags,x,y,z,radis,radis,radis,material);
 }
 
@@ -87,7 +87,7 @@ function coneZ(points,normals,texs,tags,x,y,zback,zfront,radis,material){//圆�
   return circularZ(points,normals,texs,tags,x,y,zback,zfront,radis,0,material);
 }
 
-function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,material){//圆台面，中心轴平行于z轴
+function circularZ(points,normals,texs,tags,x,y,zback,zfront,rback,rfront,material){//圆台面，中心轴平行于z轴，上表面圆心（x,y,zback），半径rback，下表面(x,y,zfront)，半径rfront
     if(zback>zfront){
       zback = [zfront,zfront=zback][0];//交换zback与zfront的值
       rback = [rfront,rfront=rback][0];
@@ -150,9 +150,9 @@ function wheelXZ(points,normals,texs,tags,x,y,z,r1,r2,material){
 }
 
 
-function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,material)//椭球
+function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,material)//椭球，x^2/(a^2)+y^2/(b^2)+z^2/(c^2)=1
 {
-  var theta1;
+  var theta1;//利用球系坐标系坐标
   var theta2;
 
   for(var j=0;j<180;j+=precise){
@@ -160,7 +160,7 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,material)//椭球
     for(var i=0;i<=360;i+=precise){
       theta1=i/360*2*Math.PI;
       //对于点，法向量和贴图映射关系的计算
-      rx=Math.sin(theta2)*Math.cos(theta1);
+      rx=Math.sin(theta2)*Math.cos(theta1);//坐标
       ry=Math.sin(theta2)*Math.sin(theta1);
       rz=Math.cos(theta2);
       rxd=Math.sin(theta2+precise/360*2*Math.PI)*Math.cos(theta1);
@@ -169,7 +169,7 @@ function ellipsoid(points,normals,texs,tags,x,y,z,a,b,c,material)//椭球
       points.push(vec3(x+a*rx,y+b*ry,z+c*rz),vec3(x+a*rxd,y+b*ryd,z+c*rzd));
       normals.push(vec3(rx/a,ry/b,rz/c),vec3(rxd/a,ryd/b,rzd/c));
 
-      var texx,texy,texxd,texyd;
+      var texx,texy,texxd,texyd;//映射关系
       texy=0.5+ry/2;
       texyd=0.5+ryd/2;
       if(rz>=0)
@@ -218,7 +218,7 @@ function addTag(tags,material,type,length,stdPos)//增加当前部件的标签
     return tagThis;
 }
 
-function medisphere(points,normals,texs,tags,x,y,z,a,b,c,material){
+function medisphere(points,normals,texs,tags,x,y,z,a,b,c,material){//半球体
   var theta1;
   var theta2;
 
@@ -272,7 +272,7 @@ function medisphere(points,normals,texs,tags,x,y,z,a,b,c,material){
    return addTag(tags,material,gl.TRIANGLE_STRIP,90*(360+precise)*2/precise/precise,stdPos);
 }
 
-function square(points,normals,texs,tags,x,y,z,a,material){
+function square(points,normals,texs,tags,x,y,z,a,material){//正方形
   x1=x-a/2;
   z1=z-a/2;
   x2=x+a/2;
