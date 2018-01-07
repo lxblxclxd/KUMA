@@ -33,7 +33,7 @@ var Material={
     red : function(){return Material.createNew(Color.red);},
     blue:function(){return Material.createNew(Color.blue);},
     green:function(){return Material.createNew(Color.green);},
-    undefine : function(i){
+    pic : function(i){
         var mt=Material.createNew();
         mt.image=i;
         return mt;

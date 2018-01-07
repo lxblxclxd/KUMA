@@ -40,8 +40,8 @@ function bear(obj) {
 
     //计算points，normals和texs并设置颜色
     //左右区分按照熊自身的位置，如左手在我们默认视角的右侧
-    var head      = sphere(points,normals,texs,tags,0,0.5,0,0.2,Material.undefine(0));//face
-    var body      = ellipsoid(points,normals,texs,tags,0,0.2,0,0.27,0.2,0.2,Material.undefine(1));//body
+    var head      = sphere(points,normals,texs,tags,0,0.5,0,0.2,Material.pic(0));//face
+    var body      = ellipsoid(points,normals,texs,tags,0,0.2,0,0.27,0.2,0.2,Material.pic(1));//body
     var leftHand  = ellipsoid(points,normals,texs,tags,0.27,0.2,0,0.05,0.08,0.05,Material.black());//left hand
     var rightHand = ellipsoid(points,normals,texs,tags,-0.27,0.2,0,0.05,0.08,0.05,Material.white());//right hand
     var leftLeg   = cylinderZ(points,normals,texs,tags,0.15,0.2-0.08,0.0,0.3,0.07,Material.black());//left leg
@@ -133,7 +133,7 @@ function readObj(obj,objRaw) {//从导出的原始对象的js文件读取为Scen
     for(j = 0;j < tagsRaw.length-1;j++){
         i=objRaw.imgs[j];
         len=tagsRaw[j+1]-tagsRaw[j];
-        addTag(tags,Material.undefine(i),0,len,[0]);
+        addTag(tags,Material.pic(i),0,len,[0]);
     }
     //addTag(tags,Material.red(),0,indicesRaw.length/3,[0]);
     obj.imgReverse=false;
@@ -146,8 +146,8 @@ function background(obj){//背景，包括天空和地面
     normals=obj.normals;
     points=obj.points;
     obj.name="background";
-    var sky=medisphere(points,normals,texs,tags,0,0,0,10,10,10,Material.undefine(0));
-    var ground=square(points,normals,texs,tags,0,0,0,40,Material.undefine(1));
+    var sky=medisphere(points,normals,texs,tags,0,0,0,10,10,10,Material.pic(0));
+    var ground=square(points,normals,texs,tags,0,0,0,40,Material.pic(1));
     obj.get={
       'sky':sky,
       'ground':ground,

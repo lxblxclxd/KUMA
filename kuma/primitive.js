@@ -27,7 +27,7 @@ function Component(type,start,numOfPoints,material) {
 
   this.father=null;//父节点
   this.sons=[];//子节点
-  this.attach=function(son,pos){
+  this.attach=function(son,pos){//父节点连上子节点
     son.father=this;
     son.rootPos=pos;
     this.sons.push(son);
