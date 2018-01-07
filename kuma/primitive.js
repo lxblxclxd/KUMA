@@ -37,8 +37,12 @@ function Component(type,start,numOfPoints,material) {
       return rotates(father.calRMat(),this.theta);
   }
   this.calCMT = function() {
-    if(this.father == null)
-      return rotates(mat4(),this.theta,this.rootPos);
+    if(this.father == null){
+      if(this.offset)
+        return translate(this.offset);
+      else
+        return rotates(mat4(),this.theta,this.rootPos);
+    }
     else
       return rotates(this.father.calCMT(),this.theta,this.rootPos);
   }

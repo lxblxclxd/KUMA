@@ -168,7 +168,6 @@ function render() {
     gl.getUniformLocation(program, "lightPosition"),
     flatten(vec4(dotLight.offset, 1))
   );
-  scene.render();
 
   //two bears
   bear1.rMat = rotates(bear1.rMat, bear1.theta);
@@ -183,6 +182,8 @@ function render() {
   hat1.offset=[bear1.offset[0],bear1.offset[1]+0.72,bear1.offset[2]];
   hat1.render();
 
+  scene.get['sky'].offset=[character.offset[0],0,character.offset[2]];
+  scene.render();
   // prepareData(hat2);
   // drawObject(hat2);
   ////////////////////////////////////////////////////////////////////////////////////////////////////////

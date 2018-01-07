@@ -147,6 +147,10 @@ function background(obj){//背景，包括天空和地面
     obj.name="background";
     var sky=medisphere(points,normals,texs,tags,0,0,0,10,10,10,Material.undefine(0));
     var ground=square(points,normals,texs,tags,0,0,0,40,Material.undefine(1));
+    obj.get={
+      'sky':sky,
+      'ground':ground,
+  };
     obj.imgReverse=true;
   }
 
