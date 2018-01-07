@@ -258,5 +258,7 @@ function drawObject(obj) {
     );
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer);
     gl.vertexAttribPointer(bear1.vPosition, 3, gl.FLOAT, false, 0, 0);
+    gl.disableVertexAttribArray(vNormal);
+    gl.disableVertexAttribArray(vTexCoord);
     drawObject(obj);
   }

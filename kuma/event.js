@@ -1,9 +1,9 @@
-front = [0.0, 0.0, 0.05];
-back = [0.0, 0.0, -0.05];
-upward = [0.0, 0.05, 0.0];
-down = [0.0, -0.05, 0.0];
-left = [0.05, 0.0, 0.0];
-right = [-0.05, 0.0, 0.0];
+front = [0.0, 0.0, 0.01];
+back = [0.0, 0.0, -0.01];
+upward = [0.0, 0.01, 0.0];
+down = [0.0, -0.01, 0.0];
+left = [0.01, 0.0, 0.0];
+right = [-0.01, 0.0, 0.0];
 
 function addEvents(){
     //event listeners for buttons
@@ -47,15 +47,17 @@ function addEvents(){
         var realkey = String.fromCharCode(event.keyCode);
 
         if (keycode == 87){//w
-            //if(character.get['leftLeg'].theta!=-90)//如果不是站立
+            if(character.get['leftLeg'].theta[0] >-90)//如果不是站立
                 character.setAction('StandUp');
-            //else
-                move(character, front);
+            else
+                character.setAction('Walk');
         }
         if (keycode == 65) move(character, left);//a
         if (keycode == 83){
-            character.setAction('SitDown');
-            move(character, back);//s
+            if(character.get['leftLeg'].theta[0] < 0)//如果不是站立
+                character.setAction('SitDown');
+            else
+                move(character, back);//s
         }
         if (keycode == 68) move(character, right);//d
 

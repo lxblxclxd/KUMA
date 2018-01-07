@@ -6,7 +6,8 @@ function setAction(obj, action) {
   act = {
     'JumpUp': JumpUp,
     'StandUp': StandUp,
-    'SitDown' : SitDown
+    'SitDown' : SitDown,
+    'Walk'  : Walk
   };
   act[action](obj);
 }
@@ -85,6 +86,36 @@ function SitDown(obj) {
           obj.offset[1] -= legLength * Math.sin(radians(i + 1));
           obj.offset[2] -= legLength * (1 - Math.cos(radians(i + 1)));
         }
+      },
+      i
+    ]);
+  }
+}
+
+function Walk(obj) {
+  if (!(obj.get["leftLeg"] || obj.get["rightLeg"])) return;
+  if (obj.actionList.length != 0) return;
+  for (i = 45 - 1; i >= -45; i--) {
+    obj.actionList.push([
+      function(obj, i) {
+        leftLeg = obj.get["leftLeg"];
+        rightLeg = obj.get["rightLeg"];
+        leftLeg.theta[0] -= i >= 0 ? 1 : -1;
+        rightLeg.theta[0] += i >= 0 ? 1 : -1;
+        move(character, front);
+      },
+      i
+    ]);
+  }
+
+  for (i = -45; i<45; i++) {
+    obj.actionList.push([
+      function(obj, i) {
+        leftLeg = obj.get["leftLeg"];
+        rightLeg = obj.get["rightLeg"];
+        leftLeg.theta[0] -= i >= 0 ? 1 : -1;
+        rightLeg.theta[0] += i >= 0 ? 1 : -1;
+        move(character, front);
       },
       i
     ]);
