@@ -175,7 +175,7 @@ function background(obj){//背景，包括天空和地面
       obj.iBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.iBuffer);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices), gl.STATIC_DRAW);
-      obj.indices=null;
+      //obj.indices=null;
     }
     obj.points = null;
     obj.normals = null;
@@ -192,7 +192,7 @@ function background(obj){//背景，包括天空和地面
     }
   }
 
-  function prepareData(obj) {
+  function prepareData(obj) {//向着色器传入对应数据，绑定对应缓存器
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.vBuffer); //绑定对应缓存区
     gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0); //从该缓存区中取数
     gl.enableVertexAttribArray(vPosition); //开启取数
@@ -211,33 +211,34 @@ function background(obj){//背景，包括天空和地面
         flatten(vec4(0, 0, 0, 0))
       );
     } else {
-      gl.uniform4fv(
-        gl.getUniformLocation(program, "colorDirect"),
-        flatten(obj.colorDirect)
-      );
+      gl.uniform4fv(gl.getUniformLocation(program, "colorDirect"),
+        flatten(obj.colorDirect));
       gl.disableVertexAttribArray(vNormal);
       gl.disableVertexAttribArray(vTexCoord);
     }
 
+    if (obj.indices) {
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.iBuffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices), gl.STREAM_DRAW);
+    }
+
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "cmt_R"),
-      false,
-      flatten(obj.rMat)
+      false, flatten(obj.rMat)
     );
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "cmt_T"),
-      false,
-      flatten(translate(obj.offset))
+      false, flatten(translate(obj.offset))
     );
   }
 
-function drawObject(obj) {
+function drawObject(obj) {//模型绘制
     for (var i = 1; i < obj.tags.length; i++) {
       obj.tags[i].render();
     }
   }
 
-  function drawShadow(obj) {
+  function drawShadow(obj) {//绘制该模型的阴影
     gl.uniform4fv(
       gl.getUniformLocation(program, "colorDirect"),
       flatten(vec4(0, 0, 0, 1))

@@ -69,6 +69,9 @@ function addEvents(){
         if(realkey=='2'){
             character=bear2;
         }
+        if(realkey=='3'){
+            character=bear3;
+        }
 
         if (keycode == 32) character.setAction('JumpUp');//space
 

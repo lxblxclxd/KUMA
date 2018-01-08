@@ -51,7 +51,7 @@ function Component(type,start,numOfPoints,material) {
   this.lengthz = function() {
     return this.frontPos[2]-this.backPos[2];
   }
-  this.render = function() {
+  this.render = function(obj) {
     gl.uniform1i(gl.getUniformLocation(program, "bTexCoord"),this.material.image);
     gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),flatten(mult(dotLight.material.ambient, this.material.ambient)));
     gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),flatten(mult(dotLight.material.diffuse, this.material.diffuse)));

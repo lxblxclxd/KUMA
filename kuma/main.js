@@ -15,6 +15,7 @@ var precise = 5; //精度
 
 var bear1 = new SceneObject();//熊
 var bear2 = new SceneObject();
+var bear3 = new SceneObject();
 var dotLight = new SceneObject();//光源
 var camera_default = new Camera();//相机
 
@@ -99,7 +100,7 @@ window.onload = function init() {
   vNormal = gl.getAttribLocation(program, "vNormal");
   vTexCoord = gl.getAttribLocation(program, "vTexCoord");
 
-  for(var i=0;i<32;i++) {
+  for(var i=0;i<16;i++) {
     textures.push(gl.createTexture());
   }
 
@@ -112,16 +113,21 @@ window.onload = function init() {
 
   //variable 1
   bear(bear1);
-  bear1.offset = [-0.35, 0.0, 0];
+  bear1.offset = [0, 0.0, 0];
   sendData(bear1);
 
   //variable 2
   //bear(bear2);
   //bear2 = bear1.copy();
   readObj(bear2,comaru);
-  bear2.offset = [0.35, 0.0, 0];
+  bear2.offset = [-1, 0.0, 0];
   //bear2.rMat=rotateY(180);
   sendData(bear2);
+
+  //fukawa
+  readObj(bear3,fukawa);
+  bear3.offset = [1,0,0];
+  sendData(bear3);
 
   christmasHat(hat1);
   hat1.offset = [-0.35, 0.72, 0];
@@ -136,7 +142,7 @@ window.onload = function init() {
   sendData(dotLight);
 
 
-  camera.attach(bear1);
+  camera.attach(bear1);//相机绑定角色1
 
   addEvents();
 
@@ -178,6 +184,8 @@ function render() {
   bear2.nextAction();
   bear2.render();
 
+  bear3.nextAction();
+  bear3.render();
 
   hat1.offset=[bear1.offset[0],bear1.offset[1]+0.72,bear1.offset[2]];
   hat1.render();
@@ -193,13 +201,14 @@ function render() {
   //shadow
   bear1.drawShadow();
   bear2.drawShadow();
+  bear3.drawShadow();
   hat1.drawShadow();
 
   window.requestAnimFrame(render);
 }
 
 function configureTexture(image, i, reverse) {
-  if (i < 0 || i >= 32) return;
+  if (i < 0 || i >= 16) return;
   texture = textures[i];
   gl.activeTexture(gl.TEXTURE0 + i);
   gl.bindTexture(gl.TEXTURE_2D, texture);

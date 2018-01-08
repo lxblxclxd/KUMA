@@ -70,6 +70,14 @@ uniform sampler2D texture4;
 uniform sampler2D texture5;
 uniform sampler2D texture6;
 uniform sampler2D texture7;
+uniform sampler2D texture8;
+uniform sampler2D texture9;
+uniform sampler2D texture10;
+uniform sampler2D texture11;
+uniform sampler2D texture12;
+uniform sampler2D texture13;
+uniform sampler2D texture14;
+uniform sampler2D texture15;
 uniform int bTexCoord;
 void
 main()
@@ -96,6 +104,22 @@ main()
       fcolor=0.4*texture2D(texture6,vec2(s,t))+Kd*texture2D(texture6,vec2(s,t))+specular;
     else if(bTexCoord==7)
       fcolor=0.4*texture2D(texture7,vec2(s,t))+Kd*texture2D(texture7,vec2(s,t))+specular;
+    else if(bTexCoord==8)
+      fcolor=0.4*texture2D(texture8,vec2(s,t))+Kd*texture2D(texture8,vec2(s,t))+specular;
+    else if(bTexCoord==9)
+      fcolor=0.4*texture2D(texture9,vec2(s,t))+Kd*texture2D(texture9,vec2(s,t))+specular;
+    else if(bTexCoord==10)
+      fcolor=0.4*texture2D(texture10,vec2(s,t))+Kd*texture2D(texture10,vec2(s,t))+specular;
+    else if(bTexCoord==11)
+      fcolor=0.4*texture2D(texture11,vec2(s,t))+Kd*texture2D(texture11,vec2(s,t))+specular;
+    else if(bTexCoord==12)
+      fcolor=0.4*texture2D(texture12,vec2(s,t))+Kd*texture2D(texture12,vec2(s,t))+specular;
+    else if(bTexCoord==13)
+      fcolor=0.4*texture2D(texture13,vec2(s,t))+Kd*texture2D(texture13,vec2(s,t))+specular;
+    else if(bTexCoord==14)
+      fcolor=0.4*texture2D(texture14,vec2(s,t))+Kd*texture2D(texture14,vec2(s,t))+specular;
+    else if(bTexCoord==15)
+      fcolor=0.4*texture2D(texture15,vec2(s,t))+Kd*texture2D(texture15,vec2(s,t))+specular;
     fcolor.a=1.0;
   }
   gl_FragColor = fcolor;
@@ -108,6 +132,7 @@ main()
   <script type="text/javascript" src="material.js"></script>
   <script type="text/javascript" src="primitive.js"></script>
   <script type="text/javascript" src="comaru.js"></script>
+  <script type="text/javascript" src="fukawa.js"></script>
   <script type="text/javascript" src="object.js"></script>
   <script type="text/javascript" src="event.js"></script>
   <script type="text/javascript" src="action.js"></script>
@@ -174,9 +199,12 @@ main()
   <img id = "comaru2" src="../img/huku2.png" hidden></img>
   <img id = "comaru3" src="../img/kami.png" hidden></img>
   <img id = "comaru4" src="../img/rfb.png" hidden></img>
-  <img id = "comaru5" src="../img/toon-se-ra-.bmp" hidden></img>
-  <img id = "comaru6" src="../img/toon-skin.bmp" hidden></img>
-  <img id = "comaru7" src="../img/touka.png" hidden></img>
+  <img id = "comaru5" src="../img/touka.png" hidden></img>
+  <img id = "fukawa0" src="../img/Tex-1.png" hidden></img>
+  <img id = "fukawa1" src="../img/Tex-2.png" hidden></img>
+  <img id = "fukawa2" src="../img/Tex-3.png" hidden></img>
+  <img id = "fukawa3" src="../img/Tex-4.png" hidden></img>
+  <img id = "fukawa4" src="../img/Tex-5.png" hidden></img>
   <img id = "background0" src = "../img/sky3.png" hidden></img>
   <img id = "background1" src = "../img/ground.png" hidden></img>
 </div>
